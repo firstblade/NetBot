@@ -79,9 +79,9 @@ void CScreenDlg::SetConnSocket(SOCKET miansocket, SOCKET helpsocket)
 	int cb = sizeof(addr);
 	int ir = getpeername(m_ConnSocket, (sockaddr*)&addr, &cb);
 	CString OnlineIP;
-	OnlineIP.Format("%s:%d", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));//ntohs函数将u_long转int
+	OnlineIP.Format(_T("%s:%d"), CString(inet_ntoa(addr.sin_addr)), ntohs(addr.sin_port));//ntohs函数将u_long转int
 
-	SetWindowText("[屏幕监控] " + OnlineIP);
+	SetWindowText(_T("[屏幕监控] ") + OnlineIP);
 }
 
 BOOL CScreenDlg::OnInitDialog()
@@ -153,7 +153,7 @@ DWORD CScreenDlg::RecvScreen()
 		!RecvMsg(m_ConnSocket, NULL, &msgHead))   //接收bmp信息
 	{
 		//数据传输失败
-		SetWindowText("远程通信失败");
+		SetWindowText(_T("远程通信失败"));
 		closesocket(m_ConnSocket);
 		return 0;//send socket type error
 	}
@@ -257,7 +257,7 @@ void CScreenDlg::OnBtnStart()
 		NULL);
 	if (hRecvScreenThread != NULL)
 	{
-		m_PicBox.SetTipText("请稍后，正在接收第一帧数据……");
+		m_PicBox.SetTipText(_T("请稍后，正在接收第一帧数据……"));
 		GetDlgItem(IDC_BTN_START)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BTN_SAVEBMP)->EnableWindow(TRUE);
 	}
@@ -411,7 +411,9 @@ void CScreenDlg::OnBtnSaveBmp()
 {
 	CString FileSavePath;
 
-	CFileDialog saveDlg(FALSE, ".bmp", "screen", OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT, "BMP Files(*.bmp)|*.bmp");
+	CFileDialog saveDlg(FALSE, _T(".bmp"),
+		_T("screen"), OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
+		_T("BMP Files(*.bmp)|*.bmp"));
 	if (saveDlg.DoModal() == IDOK)
 		FileSavePath = saveDlg.GetPathName();
 	else

@@ -56,7 +56,7 @@ void CNetBotApp::DecryptData(unsigned char *szRec, unsigned long nLen, unsigned 
 
 BOOL LoadSource(UINT resoure_id, const char * type, const char * filepath)
 {
-	HRSRC hRsrc = ::FindResource(NULL, MAKEINTRESOURCE(resoure_id), type);
+	HRSRC hRsrc = ::FindResource(NULL, MAKEINTRESOURCE(resoure_id), CA2T(type));
 
 	if (hRsrc)
 	{
@@ -69,7 +69,7 @@ BOOL LoadSource(UINT resoure_id, const char * type, const char * filepath)
 
 			CFile file;
 
-			if (file.Open(filepath, CFile::modeCreate | CFile::modeWrite))
+			if (file.Open(CA2T(filepath), CFile::modeCreate | CFile::modeWrite))
 			{
 				file.Write(MemPtr, size);
 

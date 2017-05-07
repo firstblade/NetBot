@@ -43,7 +43,7 @@ HBRUSH CCmdEdit::CtlColor(CDC* pDC, UINT nCtlColor)
 
 void CCmdEdit::ClearEdit()
 {
-	this->SetWindowText("");
+	this->SetWindowText(_T(""));
 }
 
 void CCmdEdit::AddText(LPCTSTR szText)

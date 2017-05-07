@@ -19,7 +19,6 @@ class CShellDlg : public CDialog
 public:
 	CShellDlg(CWnd* pParent = NULL);   // standard constructor
 
-public:
 	void SetConnSocket(SOCKET socket);
 	void StatusTextOut(int iPane, LPCTSTR ptzFormat, ...);
 
@@ -47,7 +46,7 @@ protected:
 protected:
 	SOCKET  m_ConnSocket;
 	MsgHead m_MsgHead;            //消息头
-	char    m_Buffer[512 * 1024]; //数据缓冲区
+	CHAR    m_Buffer[512 * 1024]; //数据缓冲区
 
 	HANDLE m_hWorkThread;
 	DWORD DOSShell();

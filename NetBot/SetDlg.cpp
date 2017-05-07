@@ -55,19 +55,19 @@ END_MESSAGE_MAP()
 // CSetDlg message handlers
 void CSetDlg::ReadIniFile()
 {
-	char Path[255];
+	TCHAR Path[255];
 	GetCurrentDirectory(255, Path);
 	CString path;
-	path.Format("%s\\NetBot.ini", Path);
+	path.Format(_T("%s\\NetBot.ini"), Path);
 	if (m_Ini.SetPath(path))
 	{
 		CString temp = m_Ini.GetKeyValue("Client Setting", "ListenPort");
-		m_ListenPort = atoi(temp);
+		m_ListenPort = _ttoi(temp);
 		temp = m_Ini.GetKeyValue("Client Setting", "MaxConnect");
-		m_ConnectMax = atoi(temp);
+		m_ConnectMax = _ttoi(temp);
 		temp = m_Ini.GetKeyValue("Client Setting", "Skin");
 
-		selectitem = atoi(temp);
+		selectitem = _ttoi(temp);
 	}
 	UpdateData(FALSE);
 }
@@ -109,9 +109,9 @@ void CSetDlg::OnBtnSetsave1()
 {
 	UpdateData();
 	CString temp;
-	temp.Format("%d", m_ListenPort);
+	temp.Format(_T("%d"), m_ListenPort);
 	m_Ini.SetKeyValue("Client Setting", "ListenPort", temp);
-	temp.Format("%d", m_ConnectMax);
+	temp.Format(_T("%d"), m_ConnectMax);
 	m_Ini.SetKeyValue("Client Setting", "MaxConnect", temp);
 
 	((CNetBotDlg *)AfxGetMainWnd())->StopListen();

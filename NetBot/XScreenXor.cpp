@@ -164,7 +164,7 @@ void XScreenXor::SaveScreenBits()
 	BITMAPINFOHEADER bi;        //位图信息头
 
 	//获取桌面HDC
-	HDC hScreenDC = CreateDC("DISPLAY", NULL, NULL, NULL);
+	HDC hScreenDC = CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
 	//为屏幕设备描述表创建兼容的内存设备描述表
 	HDC hMemDC = CreateCompatibleDC(hScreenDC);
 	//创建一个与屏幕设备描述表兼容的位图
@@ -219,7 +219,7 @@ HBITMAP XScreenXor::GetBitmapFromData()
 {
 	PBITMAPINFO lpBmpInfo = PBITMAPINFO(m_pData);
 
-	HDC hDC = CreateDC("DISPLAY", NULL, NULL, NULL);
+	HDC hDC = CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
 	// 创建DDB位图
 	HBITMAP hBitmap = CreateDIBitmap(
 		hDC,

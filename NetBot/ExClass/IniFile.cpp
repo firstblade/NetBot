@@ -48,11 +48,11 @@ BOOL CIniFile::Createini()//创建m_strPath中的ini文件
 {
 	if (m_strPath != "")
 	{
-		FILE *fp = fopen(m_strPath, "a+");
+		FILE *fp = fopen(CT2A(m_strPath), "a+");
 		fclose(fp);
 	}
 	else
-		AfxMessageBox("请先用SetPath函数设置路径!");
+		AfxMessageBox(_T("请先用SetPath函数设置路径!"));
 	return SetPath(m_strPath);
 }
 

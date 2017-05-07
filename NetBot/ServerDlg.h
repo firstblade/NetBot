@@ -17,7 +17,7 @@ public:
 	CServerDlg(CWnd* pParent = NULL);   // standard constructor
 	char  ServerUrl[256];
 
-	char Path[512];
+	TCHAR Path[512];
 
 	// Dialog Data
 		//{{AFX_DATA(CServerDlg)
@@ -45,7 +45,7 @@ protected:
 	CIniFile m_Ini;
 	void ReadIniFile();
 
-	int Compress(char File[], DWORD id);
+	int Compress(TCHAR File[], DWORD id);
 	void CompressFsg();
 	void CompressUpx();
 protected:

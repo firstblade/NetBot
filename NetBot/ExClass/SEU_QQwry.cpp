@@ -286,8 +286,10 @@ CString SEU_QQwry::GetStr()
 *********************************************************************/
 void SEU_QQwry::SaveToFile(CString Name)
 {
-	CString str1, str2;
-	FILE *out = fopen(Name + ".txt", "wb");
+	CStringA str1, str2;
+	FILE *out = fopen(CT2A(Name + ".txt"), "wb");
+
+	CStringA m_buf;
 	m_buf.Format("Total %d\r\n", GetRecordCount());//得到总记录
 	fwrite(m_buf, 1, m_buf.GetLength(), out);//输出
 	for (m_i = 0; m_i < GetRecordCount(); m_i++)
@@ -397,7 +399,7 @@ DWORD SEU_QQwry::IPtoDWORD(CString szIP)
 		szTemp += ch;
 		if (ch == '.')
 		{
-			b[iXB] = atoi(szTemp);
+			b[iXB] = _ttoi(szTemp);
 			szTemp = "";
 			iXB++;
 		}

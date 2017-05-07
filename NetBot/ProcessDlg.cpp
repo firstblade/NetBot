@@ -53,9 +53,9 @@ void CProcessDlg::SetConnSocket(SOCKET socket)
 	int cb = sizeof(addr);
 	getpeername(m_ConnSocket, (sockaddr*)&addr, &cb);
 	CString OnlineIP;
-	OnlineIP.Format("%s:%d", inet_ntoa(addr.sin_addr), ntohs(addr.sin_port));//ntohs函数将u_long转int
+	OnlineIP.Format(_T("%s:%d"), CString(inet_ntoa(addr.sin_addr)), ntohs(addr.sin_port));//ntohs函数将u_long转int
 
-	SetWindowText("[进程查询] " + OnlineIP);
+	SetWindowText(_T("[进程查询] ") + OnlineIP);
 
 	OnGetprocessBtn();
 }
@@ -86,11 +86,11 @@ BOOL CProcessDlg::OnInitDialog()
 	m_wndStatusBar.SetParts(2, strPartDim);
 
 	ListView_SetExtendedListViewStyle(m_ProcessList.m_hWnd, LVS_EX_GRIDLINES | LVS_EX_FULLROWSELECT);
-	m_ProcessList.InsertColumn(0, "进程名称", LVCFMT_LEFT, 200);
-	m_ProcessList.InsertColumn(1, "进程ID", LVCFMT_LEFT, 60);
-	m_ProcessList.InsertColumn(2, "线程总数", LVCFMT_LEFT, 70);
-	m_ProcessList.InsertColumn(3, "进程优先级", LVCFMT_LEFT, 90);
-	m_ProcessList.InsertColumn(4, "进程路径", LVCFMT_LEFT, 800);
+	m_ProcessList.InsertColumn(0, _T("进程名称"), LVCFMT_LEFT, 200);
+	m_ProcessList.InsertColumn(1, _T("进程ID"), LVCFMT_LEFT, 60);
+	m_ProcessList.InsertColumn(2, _T("线程总数"), LVCFMT_LEFT, 70);
+	m_ProcessList.InsertColumn(3, _T("进程优先级"), LVCFMT_LEFT, 90);
+	m_ProcessList.InsertColumn(4, _T("进程路径"), LVCFMT_LEFT, 800);
 	return TRUE;
 }
 
@@ -139,7 +139,7 @@ void CProcessDlg::OnClickProcessList(NMHDR* pNMHDR, LRESULT* pResult)
 
 		CString process = m_ProcessList.GetItemText(iCurrSel, 0);
 
-		StatusTextOut(0, "进程名称:%s ID:%d", process, dwSelPid);
+		StatusTextOut(0, _T("进程名称:%s ID:%d"), process, dwSelPid);
 	}
 
 	*pResult = 0;
@@ -153,7 +153,7 @@ void CProcessDlg::OnGetprocessBtn()
 	//开启线程
 	m_hWorkThread = ThreadTemplate::StartThread<CProcessDlg, DWORD >(this, &CProcessDlg::ListProcess);
 	if (m_hWorkThread == NULL)
-		StatusTextOut(0, "获取远程进程失败");
+		StatusTextOut(0, _T("获取远程进程失败"));
 }
 
 void CProcessDlg::OnKillprocessBtn()
@@ -162,12 +162,12 @@ void CProcessDlg::OnKillprocessBtn()
 		return;
 
 	if (m_ProcessList.GetSelectedCount() < 1)
-		StatusTextOut(0, "请选择要关闭的进程");
+		StatusTextOut(0, _T("请选择要关闭的进程"));
 
 	//开启线程
 	m_hWorkThread = ThreadTemplate::StartThread<CProcessDlg, DWORD >(this, &CProcessDlg::KillProcess);
 	if (m_hWorkThread == NULL)
-		StatusTextOut(0, "关闭进程失败");
+		StatusTextOut(0, _T("关闭进程失败"));
 }
 
 void CProcessDlg::StopWork()
@@ -216,14 +216,14 @@ DWORD CProcessDlg::ListProcess()
 	if (!SendMsg(m_ConnSocket, m_Buffer, &m_MsgHead) || !RecvMsg(m_ConnSocket, m_Buffer, &m_MsgHead))
 	{
 		//数据传输失败
-		StatusTextOut(0, "通信失败");
+		StatusTextOut(0, _T("通信失败"));
 		OnWorkEnd();
 		return 0;
 	}
 	if (m_MsgHead.dwCmd != 0)
 	{
 		//数据传输失败
-		StatusTextOut(0, "获取远程进程失败");
+		StatusTextOut(0, _T("获取远程进程失败"));
 		OnWorkEnd();
 		return 0;
 	}
@@ -239,27 +239,27 @@ DWORD CProcessDlg::ListProcess()
 		if (pInfo[i].dwPid == 0x0)
 		{
 			if (i == 0)
-				lstrcpy(pInfo[i].FilePath, "");
+				strcpy(pInfo[i].FilePath, "");
 			else
 				continue;
 		}
 
 		//添加进程
 		CString temp;
-		m_ProcessList.InsertItem(i, "");
+		m_ProcessList.InsertItem(i, _T(""));
 		m_ProcessList.SetItemData(i, pInfo[i].dwPid);
-		m_ProcessList.SetItemText(i, 0, pInfo[i].FileName);
-		temp.Format("%d", pInfo[i].dwPid);
+		m_ProcessList.SetItemText(i, 0, CString(pInfo[i].FileName));
+		temp.Format(_T("%d"), pInfo[i].dwPid);
 		m_ProcessList.SetItemText(i, 1, temp);
-		temp.Format("%d", pInfo[i].dwThreads);
+		temp.Format(_T("%d"), pInfo[i].dwThreads);
 		m_ProcessList.SetItemText(i, 2, temp);
 		m_ProcessList.SetItemText(i, 3, __MakePriority(pInfo[i].dwPriClass));
-		m_ProcessList.SetItemText(i, 4, pInfo[i].FilePath);
+		m_ProcessList.SetItemText(i, 4, CString(pInfo[i].FilePath));
 	}
 
 	StatusTextOut(1, _T("数量: %d"), m_ProcessList.GetItemCount());
 
-	StatusTextOut(0, "");
+	StatusTextOut(0, _T(""));
 	OnWorkEnd();
 	return 0;
 }
@@ -279,14 +279,14 @@ DWORD CProcessDlg::KillProcess()
 	if (!SendMsg(m_ConnSocket, m_Buffer, &m_MsgHead) || !RecvMsg(m_ConnSocket, m_Buffer, &m_MsgHead))
 	{
 		//数据传输失败
-		StatusTextOut(0, "通信失败");
+		StatusTextOut(0, _T("通信失败"));
 		OnWorkEnd();
 		return 0;
 	}
 	if (m_MsgHead.dwCmd != 0)
 	{
 		//数据传输失败
-		StatusTextOut(0, "关闭进程失败");
+		StatusTextOut(0, _T("关闭进程失败"));
 		OnWorkEnd();
 		return 0;
 	}
@@ -296,7 +296,7 @@ DWORD CProcessDlg::KillProcess()
 
 	StatusTextOut(1, _T("数量: %d"), m_ProcessList.GetItemCount());
 
-	StatusTextOut(0, "");
+	StatusTextOut(0, _T(""));
 	OnWorkEnd();
 	return 0;
 }
@@ -307,25 +307,25 @@ CString CProcessDlg::__MakePriority(DWORD dwPriClass)
 	switch (dwPriClass)
 	{
 	case REALTIME_PRIORITY_CLASS:
-		strRet = "实时";
+		strRet = _T("实时");
 		break;
 	case HIGH_PRIORITY_CLASS:
-		strRet = "高";
+		strRet = _T("高");
 		break;
 	case 0x00008000:	//ABOVE_NORMAL_PRIORITY_CLASS
-		strRet = "高于标准";
+		strRet = _T("高于标准");
 		break;
 	case NORMAL_PRIORITY_CLASS:
-		strRet = "标准";
+		strRet = _T("标准");
 		break;
 	case 0x00004000:	//BELOW_NORMAL_PRIORITY_CLASS
-		strRet = "低于标准";
+		strRet = _T("低于标准");
 		break;
 	case IDLE_PRIORITY_CLASS:
-		strRet = "空闲";
+		strRet = _T("空闲");
 		break;
 	default:
-		strRet = "未知";
+		strRet = _T("未知");
 		break;
 	}
 

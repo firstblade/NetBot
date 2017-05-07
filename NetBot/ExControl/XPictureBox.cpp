@@ -58,7 +58,6 @@ void XPictureBox::CleanBitmap()
 
 void XPictureBox::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
 	if (nSBCode != SB_ENDSCROLL)
 	{
 		SCROLLINFO hStructure;
@@ -75,7 +74,6 @@ void XPictureBox::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 
 void XPictureBox::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-	// TODO: Add your message handler code here and/or call default
 	if (nSBCode != SB_ENDSCROLL)
 	{
 		SCROLLINFO vStructure;
@@ -94,7 +92,6 @@ void XPictureBox::OnPaint()
 {
 	CPaintDC dc(this); // device context for painting
 
-	// TODO: Add your message handler code here
 	if (m_hBitmap.m_hObject != NULL)
 	{
 		CDC hdc;
@@ -146,19 +143,19 @@ void XPictureBox::OnPaint()
 	// Do not call CWnd::OnPaint() for painting messages
 }
 
-BOOL XPictureBox::SaveBmp(const char *FileName)
+bool XPictureBox::SaveBmp(const TCHAR *FileName)
 {
 	HBITMAP hBitmap = (HBITMAP)m_hBitmap.GetSafeHandle();
-	//位图中每象素所占字节数       
-	WORD wBitCount; 
+	//位图中每象素所占字节数
+	WORD wBitCount;
 	DWORD dwPaletteSize = 0, dwWritten = 0;
-	BITMAP Bitmap; 
+	BITMAP Bitmap;
 	BITMAPFILEHEADER bmfHdr;
-	BITMAPINFOHEADER bi;          
+	BITMAPINFOHEADER bi;
 	HANDLE hOldPal = NULL;
 
-	//计算位图文件每个像素所占字节数           
-	HDC hDC = ::CreateDC("DISPLAY", NULL, NULL, NULL);
+	//计算位图文件每个像素所占字节数
+	HDC hDC = ::CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
 	int iBits = ::GetDeviceCaps(hDC, BITSPIXEL)* ::GetDeviceCaps(hDC, PLANES);
 	::DeleteDC(hDC);
 
@@ -186,12 +183,12 @@ BOOL XPictureBox::SaveBmp(const char *FileName)
 
 	DWORD dwBmBitsSize = ((Bitmap.bmWidth * wBitCount + 31) / 32) * 4 * Bitmap.bmHeight;
 
-	//为位图内容分配内存           
+	//为位图内容分配内存
 	HANDLE hDib = ::GlobalAlloc(GHND, dwBmBitsSize + dwPaletteSize + sizeof(BITMAPINFOHEADER));
 	LPBITMAPINFOHEADER lpbi = (LPBITMAPINFOHEADER)::GlobalLock(hDib);
 	*lpbi = bi;
 
-	//处理调色板               
+	//处理调色板
 	HANDLE hPal = GetStockObject(DEFAULT_PALETTE);
 	if (hPal)
 	{
@@ -200,11 +197,11 @@ BOOL XPictureBox::SaveBmp(const char *FileName)
 		RealizePalette(hDC);
 	}
 
-	//获取该调色板下新的像素值           
+	//获取该调色板下新的像素值
 	GetDIBits(hDC, hBitmap, 0, (UINT)Bitmap.bmHeight, (LPSTR)lpbi + sizeof(BITMAPINFOHEADER) + dwPaletteSize,
 		(BITMAPINFO*)lpbi, DIB_RGB_COLORS);
 
-	//恢复调色板               
+	//恢复调色板
 	if (hOldPal)
 	{
 		::SelectPalette(hDC, (HPALETTE)hOldPal, TRUE);
@@ -212,25 +209,25 @@ BOOL XPictureBox::SaveBmp(const char *FileName)
 		::ReleaseDC(NULL, hDC);
 	}
 
-	//创建位图文件               
+	//创建位图文件
 	HANDLE fh = CreateFile(FileName, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS,
-	                       FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
+		FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
 	if (fh == INVALID_HANDLE_VALUE)
 		return FALSE;
 
-	//设置位图文件头           
-	bmfHdr.bfType = 0x4D42;     //"BM"           
+	//设置位图文件头
+	bmfHdr.bfType = 0x4D42;     //"BM"
 	DWORD dwDIBSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + dwPaletteSize + dwBmBitsSize;
 	bmfHdr.bfSize = dwDIBSize;
 	bmfHdr.bfReserved1 = 0;
 	bmfHdr.bfReserved2 = 0;
 	bmfHdr.bfOffBits = (DWORD)sizeof(BITMAPFILEHEADER) + (DWORD)sizeof(BITMAPINFOHEADER) + dwPaletteSize;
-	//写入位图文件头           
+	//写入位图文件头
 	WriteFile(fh, (LPSTR)&bmfHdr, sizeof(BITMAPFILEHEADER), &dwWritten, NULL);
-	//写入位图文件其余内容           
+	//写入位图文件其余内容
 	WriteFile(fh, (LPSTR)lpbi, dwDIBSize, &dwWritten, NULL);
-	//清除               
+	//清除
 	GlobalUnlock(hDib);
 	GlobalFree(hDib);
 	CloseHandle(fh);

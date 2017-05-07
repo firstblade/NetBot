@@ -40,7 +40,7 @@ public:
 		if (!m_state) return false;
 		EnterCriticalSection(&m_cs);
 		count++;
-		_Track("Lock%d", count);
+		_Track(_T("Lock%d"), count);
 		return true;
 	}
 
@@ -48,7 +48,7 @@ public:
 	{
 		if (!m_state) return false;
 		LeaveCriticalSection(&m_cs);
-		_Track("UnLock%d", count);
+		_Track(_T("UnLock%d"), count);
 		return true;
 	}
 };

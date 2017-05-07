@@ -50,14 +50,14 @@ int CALLBACK ListCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 	case CSortListCtrl::DATA_TYPE::DOUBLE_TYPE:		//thoughout
 	case CSortListCtrl::DATA_TYPE::INT_TYPE:
 	{
-		char str[256] = { 0 };
+		TCHAR str[256] = { 0 };
 
 		lstrcpy(str, str1);
 
-		int i1 = atoi(str);
+		int i1 = _ttoi(str);
 		lstrcpy(str, str2);
 
-		int i2 = atoi(str);
+		int i2 = _ttoi(str);
 
 		if (i1 > i2)
 			iCompRes = 1;
@@ -71,11 +71,11 @@ int CALLBACK ListCompare(LPARAM lParam1, LPARAM lParam2, LPARAM lParamSort)
 	case CSortListCtrl::DATA_TYPE::STRING_TYPE:		//throughout
 	default:
 	{
-		char strf[256] = { 0 }, strn[256] = { 0 };
+		TCHAR strf[256] = { 0 }, strn[256] = { 0 };
 		lstrcpy(strf, str1);
 		lstrcpy(strn, str2);
 
-		iCompRes = strcmp(strf, strn);
+		iCompRes = lstrcmp(strf, strn);
 	}
 	break;
 	}

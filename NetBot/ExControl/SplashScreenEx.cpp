@@ -32,7 +32,7 @@ CSplashScreenEx::CSplashScreenEx()
 
 	HMODULE hUser32 = GetModuleHandle(_T("USER32.DLL"));
 	if (hUser32 != NULL)
-		m_fnAnimateWindow = (FN_ANIMATE_WINDOW)GetProcAddress(hUser32, _T("AnimateWindow"));
+		m_fnAnimateWindow = (FN_ANIMATE_WINDOW)GetProcAddress(hUser32, "AnimateWindow");
 	else
 		m_fnAnimateWindow = NULL;
 
@@ -67,7 +67,7 @@ BOOL CSplashScreenEx::Create(CWnd *pWndParent, LPCTSTR szText, DWORD dwStyle)
 	wcx.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wcx.hbrBackground = ::GetSysColorBrush(COLOR_WINDOW);
 	wcx.lpszMenuName = NULL;
-	wcx.lpszClassName = "SplashScreenExClass";
+	wcx.lpszClassName = _T("SplashScreenExClass");
 	wcx.hIconSm = NULL;
 
 	if (m_dwStyle & CSS_SHADOW)
@@ -88,7 +88,7 @@ BOOL CSplashScreenEx::Create(CWnd *pWndParent, LPCTSTR szText, DWORD dwStyle)
 			return FALSE;
 	}
 
-	if (!CreateEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, "SplashScreenExClass", NULL, WS_POPUP, 0, 0, 0, 0, pWndParent->m_hWnd, NULL))
+	if (!CreateEx(WS_EX_TOOLWINDOW | WS_EX_TOPMOST, _T("SplashScreenExClass"), NULL, WS_POPUP, 0, 0, 0, 0, pWndParent->m_hWnd, NULL))
 		return FALSE;
 
 	return TRUE;
@@ -294,7 +294,7 @@ HRGN CSplashScreenEx::CreateRgnFromBitmap(HBITMAP hBmp, COLORREF color)
 				if (pRgnData->nCount >= cBlocks * MAXBUF) {
 					LPBYTE pRgnDataNew = new BYTE[RDHDR + ++cBlocks * MAXBUF * sizeof(RECT)];
 					memcpy(pRgnDataNew, pRgnData, RDHDR + (cBlocks - 1) * MAXBUF * sizeof(RECT));
-					delete pRgnData;
+					delete[] pRgnData;
 					pRgnData = (RGNDATAHEADER*)pRgnDataNew;
 				}
 				wasfirst = false;
@@ -321,7 +321,7 @@ HRGN CSplashScreenEx::CreateRgnFromBitmap(HBITMAP hBmp, COLORREF color)
 	ASSERT(hRgn != NULL);
 	/* } ExtCreateRegion replacement */
 
-	delete pRgnData;
+	delete[] pRgnData;
 	return hRgn;
 }
 
