@@ -279,4 +279,10 @@
       <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="res\xp.mainfest" />
+    <None Include="res\fsg.exe" />
+    <None Include="res\upx.exe" />
+    <None Include="..\nb.exe" />
+  </ItemGroup>
 </Project>

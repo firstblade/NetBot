@@ -74,7 +74,7 @@ BEGIN_MESSAGE_MAP(CServerDlg, CDialog)
 END_MESSAGE_MAP()
 
 /////////////////////////////////////////////////////////////////////////////
-// CServerDlg message handlers 
+// CServerDlg message handlers
 void CServerDlg::ReadIniFile()
 {
 	char Path[255];
@@ -165,7 +165,7 @@ int LoadRes(LPBYTE *Mem, DWORD id)
 	HRSRC hResInfo = FindResource(NULL, MAKEINTRESOURCE(id), "EXE");
 	if (hResInfo == NULL)
 	{
-		Msg("Can't Find Resource.");
+		ShowMsg("Can't Find Resource.");
 		return -1;
 	}
 
@@ -174,14 +174,14 @@ int LoadRes(LPBYTE *Mem, DWORD id)
 	hResData = LoadResource(NULL, hResInfo);
 	if (hResData == NULL)
 	{
-		Msg("Can't Load Resource.");
+		ShowMsg("Can't Load Resource.");
 		return -1;
 	}
 
 	*Mem = (LPBYTE)GlobalAlloc(GPTR, dwSize);
 	if (*Mem == NULL)
 	{
-		Msg("Can't Allocate Memory.");
+		ShowMsg("Can't Allocate Memory.");
 		return -1;
 	}
 
@@ -202,7 +202,7 @@ int ResToFile(char Path[], DWORD id)
 	if (hFile == NULL)
 	{
 		GlobalFree(p);
-		Msg("Can't Write file.");
+		ShowMsg("Can't Write file.");
 
 		return 1;
 	}

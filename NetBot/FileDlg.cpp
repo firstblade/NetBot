@@ -791,7 +791,6 @@ void CFileDlg::OnFileBackup()
 
 void CFileDlg::OnFileViewChg()
 {
-	// TODO: Add your command handler code here
 	switch (m_ViewStyle)
 	{
 	case LVS_ICON:
@@ -826,7 +825,6 @@ void CFileDlg::OnFileViewChg()
 
 void CFileDlg::OnDblclkFilelist(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	// TODO: Add your control notification handler code here
 	m_FileTree.SelectItem(NULL);
 	//双击文件夹打开
 	POSITION pos = m_FileList.GetFirstSelectedItemPosition();
@@ -856,7 +854,6 @@ void CFileDlg::OnDblclkFilelist(NMHDR* pNMHDR, LRESULT* pResult)
 //左键单击，选定文件
 void CFileDlg::OnClickFilelist(NMHDR* pNMHDR, LRESULT* pResult)
 {
-	// TODO: Add your control notification handler code here
 	m_FileTree.SelectItem(NULL);
 	//单击组装文件路径
 	POSITION pos = m_FileList.GetFirstSelectedItemPosition();

@@ -8,7 +8,7 @@ BOOL TurnonKeepAlive(SOCKET s, UINT nKeepAliveSec)
 		return TRUE;
 
 	BOOL bSetKeepAlive = TRUE;
-	if (::setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (const char*)&bSetKeepAlive, sizeof(BOOL)) != 0)
+	if (setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (const char*)&bSetKeepAlive, sizeof(BOOL)) != 0)
 		return FALSE;
 
 	DWORD dwBytes;
@@ -19,7 +19,7 @@ BOOL TurnonKeepAlive(SOCKET s, UINT nKeepAliveSec)
 
 	struct tcp_keepalive Retvals = { 0 };
 
-	if (::WSAIoctl(s, SIO_KEEPALIVE_VALS, &Settings, sizeof(Settings), &Retvals, sizeof(Retvals), &dwBytes, NULL, NULL) != 0)
+	if (WSAIoctl(s, SIO_KEEPALIVE_VALS, &Settings, sizeof(Settings), &Retvals, sizeof(Retvals), &dwBytes, NULL, NULL) != 0)
 	{
 		return FALSE;
 	}
@@ -41,7 +41,7 @@ BOOL SendData(SOCKET s, char *data, int len)
 		int iRet = send(s, pData, iLeftSend, 0);
 		if (iRet == 0 || iRet == SOCKET_ERROR)
 		{
-			//MsgErr("Send Data Function Error : %d", WSAGetLastError());
+			DbpErr("Send Data Error : %d, iRet = %d", WSAGetLastError(), iRet);
 			return FALSE;
 		}
 
@@ -58,7 +58,7 @@ BOOL SendData(SOCKET s, char *data, int len)
 //接收数据
 BOOL RecvData(SOCKET s, char *data, int len)
 {
-	char * pData = data;
+	char *pData = data;
 	int iHasRecv = 0;
 	int iLeftRecv = len;
 
@@ -70,7 +70,7 @@ BOOL RecvData(SOCKET s, char *data, int len)
 		int iRet = recv(s, pData, iLeftRecv, 0);
 		if (iRet == 0 || iRet == SOCKET_ERROR)
 		{
-			//MsgErr("Recv Data Function Error : %d", WSAGetLastError());
+			DbpErr("Recv Data Error : %d, iRet = %d", WSAGetLastError(), iRet);
 			return FALSE;
 		}
 

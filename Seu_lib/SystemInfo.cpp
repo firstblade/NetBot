@@ -1,6 +1,21 @@
 #include "stdafx.h"
 #include "SystemInfo.h"
 
+BOOL RtlGetVersionEx(LPOSVERSIONINFOW lpVersionInformation)
+{
+	typedef DWORD NTSTATUS;
+
+	typedef NTSTATUS(NTAPI* TRtlGetVersion)(PRTL_OSVERSIONINFOW);
+	TRtlGetVersion lpRtlGetVersion = (TRtlGetVersion)GetProcAddress(GetModuleHandleW(L"NTDLL"), "RtlGetVersion");
+
+	if (lpRtlGetVersion)
+	{
+		return lpRtlGetVersion((PRTL_OSVERSIONINFOW)lpVersionInformation) >= 0;
+	}
+
+	return false;
+}
+
 BOOL GetSystemInfo(SysInfo& info)
 {
 	ZeroMemory(&info, sizeof(SysInfo));
@@ -9,10 +24,10 @@ BOOL GetSystemInfo(SysInfo& info)
 	GetComputerNameA(info.cComputer, &iSize);
 
 	char szSystem[32];
-	OSVERSIONINFOEXA osvi;
-	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEXA));
-	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXA);
-	if (!GetVersionExA((OSVERSIONINFOA *)&osvi))
+	OSVERSIONINFOEXW osvi;
+	ZeroMemory(&osvi, sizeof(OSVERSIONINFOEXW));
+	osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEXW);
+	if (!RtlGetVersionEx((OSVERSIONINFOW *)&osvi))
 		return FALSE;
 
 	switch (osvi.dwPlatformId)
@@ -58,10 +73,6 @@ BOOL GetSystemInfo(SysInfo& info)
 
 	MEMORYSTATUSEX mem;
 	mem.dwLength = sizeof(mem);
-
-	//typedef void(WINAPI* FunctionGlobalMemoryStatusEx)(LPMEMORYSTATUS);
-	//FunctionGlobalMemoryStatusEx GlobalMemoryStatusEx;
-	//GlobalMemoryStatusEx = (FunctionGlobalMemoryStatusEx)GetProcAddress(GetModuleHandle("kernel32.dll"), "GlobalMemoryStatusEx");
 
 	GlobalMemoryStatusEx(&mem);//调用函数取得系统的内存情况
 

@@ -111,6 +111,7 @@ protected:
 	CIniFile          m_Ini;
 	SEU_QQwry         m_QQDat;
 	CTrueColorToolBar m_wndtoolbar;
+	//CToolBar          m_wndtoolbar;
 	CStatusBarCtrl    m_wndStatusBar;
 	CImageList        m_ImageOnlinelist;
 

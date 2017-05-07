@@ -53,4 +53,5 @@ svchostDll
 *.ipdb
 *.sdf
 *.ipch
-/ipch
+ipch/
+dll/

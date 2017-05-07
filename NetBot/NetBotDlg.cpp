@@ -250,39 +250,38 @@ BOOL CNetBotDlg::OnInitDialog()
 	////////////////////////////////////////////////////////////////////////
 	//create toolbar
 	if (!m_wndtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
-		| CBRS_GRIPPER | CBRS_TOOLTIPS | CBRS_FLYBY | CBRS_SIZE_DYNAMIC,
+		| CBRS_TOOLTIPS | CBRS_FLYBY, //| CBRS_SIZE_DYNAMIC  | CBRS_GRIPPER
 		CRect(0, 0, 0, 0)) || !m_wndtoolbar.LoadToolBar(IDR_MAINTOOLBAR))
 	{
 		TRACE0("failed to create toolbar\n");
 		return FALSE;
 	}
-	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 	m_wndtoolbar.LoadTrueColorToolBar(16, IDB_BMP_MAIN, IDB_BMP_MAIN, IDB_BMP_MAIN);
+	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 
-	//-----------------------------------------------------------------------------
 	//设置工具条显示风格为图标加下方文本方式
 	CString strButton;
 	CRect rectButton;
-	for (int ii = 0; ii < m_wndtoolbar.GetCount(); ii++)//为每个按钮增加文本
+	for (int i = 0; i < m_wndtoolbar.GetCount(); i++) //为每个按钮增加文本
 	{
-		UINT id = m_wndtoolbar.GetItemID(ii);
+		UINT id = m_wndtoolbar.GetItemID(i);
 		if (!strButton.LoadString(id))
 			continue;
+
 		int j = strButton.Find(_T('\n'));
 		if (j < 0) continue;
 		strButton = strButton.Right(strButton.GetLength() - j - 1);
-		m_wndtoolbar.SetButtonText(ii, strButton);
+		m_wndtoolbar.SetButtonText(i, strButton);
 	}
-	m_wndtoolbar.GetItemRect(0, &rectButton);//调整新的工具条大小
+	m_wndtoolbar.GetItemRect(0, &rectButton); //调整新的工具条大小
 	m_wndtoolbar.SetSizes(rectButton.Size(), CSize(16, 16));
-	//-----------------------------------------------------------------------------
-	////////////////////////////////////////////////////////////////////////
+
 	//create statusbar
 	m_wndStatusBar.Create(WS_CHILD | WS_VISIBLE | CCS_BOTTOM, CRect(0, 0, 0, 0), this, 0x1000003);
 	int strPartDim[3] = { 350, 550, -1 };
 	m_wndStatusBar.SetParts(3, strPartDim);
 	m_wndStatusBar.SetText("当前在线主机 [0]", 2, 0);
-	////////////////////////////////////////////////////////////////////////
+
 	//create online list
 	ListView_SetExtendedListViewStyle(m_OnLineList.m_hWnd, LVS_EX_DOUBLEBUFFER |
 		LVS_EX_GRIDLINES |
@@ -290,13 +289,13 @@ BOOL CNetBotDlg::OnInitDialog()
 		LVS_EX_HEADERDRAGDROP |
 		LVS_EX_CHECKBOXES);
 
-	m_OnLineList.InsertColumn(0, "IP地址/端口", LVCFMT_LEFT, 160);
-	m_OnLineList.InsertColumn(1, "计算机名", LVCFMT_LEFT, 140);
-	m_OnLineList.InsertColumn(2, "所在地域", LVCFMT_LEFT, 160);
-	m_OnLineList.InsertColumn(3, "操作系统", LVCFMT_LEFT, 220);
-	m_OnLineList.InsertColumn(4, "内存", LVCFMT_LEFT, 80);
-	m_OnLineList.InsertColumn(5, "版本", LVCFMT_LEFT, 80);
-	m_OnLineList.InsertColumn(6, "状态", LVCFMT_LEFT, 40);
+	m_OnLineList.InsertColumn(0, "IP地址/端口", LVCFMT_LEFT, 250);
+	m_OnLineList.InsertColumn(1, "计算机名", LVCFMT_LEFT, 200);
+	m_OnLineList.InsertColumn(2, "所在地域", LVCFMT_LEFT, 250);
+	m_OnLineList.InsertColumn(3, "操作系统", LVCFMT_LEFT, 350);
+	m_OnLineList.InsertColumn(4, "内存", LVCFMT_LEFT, 100);
+	m_OnLineList.InsertColumn(5, "版本", LVCFMT_LEFT, 150);
+	m_OnLineList.InsertColumn(6, "状态", LVCFMT_LEFT, 100);
 	m_ImageOnlinelist.Create(14, 14, ILC_COLOR24 | ILC_MASK, 2, 2);
 	HICON hIcon0 = ::LoadIcon(AfxGetResourceHandle(), MAKEINTRESOURCE(IDI_LIST_ONLINE));
 	m_ImageOnlinelist.Add(hIcon0);
@@ -745,6 +744,7 @@ DWORD CNetBotDlg::AcceptSocket(SOCKET socket)
 		//接收上线信息
 		if (!RecvMsg(socket, chBuffer, &msgHead))
 		{
+			Dbp("can't recv msghead");
 			return 0;
 		}
 
@@ -753,10 +753,11 @@ DWORD CNetBotDlg::AcceptSocket(SOCKET socket)
 		case SOCKET_DLLLOADER:
 		{
 			PCHAR SvcFileBuf;
-			int SvcFileSize = ReadData(_T("Svc.dll"), &SvcFileBuf);
+			int SvcFileSize = ReadData(_T("Svchost.dll"), &SvcFileBuf);
 
 			if (SvcFileSize == -1)
 			{
+				ShowMsg("Can't read source dll.");
 				shutdown(socket, 0x02);
 				closesocket(socket);
 				break;

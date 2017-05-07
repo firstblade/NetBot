@@ -23,7 +23,7 @@
 #include "../Seu_lib/SystemInfo.h"
 #include "../Seu_lib/Command.h"
 
-#include "..\\..\\debugh.h"
+#include "..//..//debugh.h"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

@@ -128,17 +128,14 @@ void CSetDlg::OnBtnSetsave4()
 	if (((CButton*)GetDlgItem(IDC_RADIO1))->GetCheck())
 	{
 		selectitem = 1;
-		SkinH_AttachEx("aero.she", NULL);
 	}
 	else if (((CButton*)GetDlgItem(IDC_RADIO2))->GetCheck())
 	{
 		selectitem = 2;
-		SkinH_AttachEx("china.she", NULL);
 	}
 	else
 	{
 		selectitem = 3;
-		SkinH_AttachEx("Win7Glass.she", NULL);
 	}
 
 	sprintf(strSkin, "%d", selectitem);

