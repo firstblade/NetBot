@@ -148,7 +148,7 @@ void FileExec(char *pBuf, LPMsgHead lpMsgHead)
 		}
 	}
 
-	HINSTANCE hInst = ::ShellExecuteA(NULL, "open", m_FileOpt.cScrFile, NULL, NULL, ShowState);
+	HINSTANCE hInst = ShellExecuteA(NULL, "open", m_FileOpt.cScrFile, NULL, NULL, ShowState);
 	if ((INT)hInst < 32) //若返回值小于32出现错误
 		lpMsgHead->dwCmd = CMD_FAILED;
 	else

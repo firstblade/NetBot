@@ -139,11 +139,10 @@ void CScreenDlg::OnSize(UINT nType, int cx, int cy)
 DWORD CScreenDlg::RecvScreen()
 {
 	//设置发送缓冲区,有利于屏幕传输
-	int rcvbuf = 65536; //64KB
-	int rcvbufsize = sizeof(int);
-	setsockopt(m_ConnSocket, SOL_SOCKET, SO_SNDBUF, (char*)&rcvbuf, rcvbufsize);
-	int bNodelay = 1;
-	setsockopt(m_ConnSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&bNodelay, sizeof(bNodelay));//不采用延时算法
+	int bufSize = 65536; //64KB
+	setsockopt(m_ConnSocket, SOL_SOCKET, SO_SNDBUF, (char*)&bufSize, sizeof(bufSize));
+	//int bNodelay = 1;
+	//setsockopt(m_ConnSocket, IPPROTO_TCP, TCP_NODELAY, (char*)&bNodelay, sizeof(bNodelay));//不采用延时算法
 
 	MsgHead msgHead;
 	msgHead.dwCmd = SOCKET_SCREEN;
@@ -197,7 +196,7 @@ DWORD CScreenDlg::RecvScreen()
 				iRecvLen += iRecved;
 				m_Progress.SetPos(iRecvLen);
 			}
-			/////////////////////////////////////////////
+
 			DWORD lenthUncompress = msgHead.dwExtend1;
 			if (msgHead.dwCmd == 0)
 			{
@@ -211,7 +210,7 @@ DWORD CScreenDlg::RecvScreen()
 
 			//显示图像
 			m_PicBox.SetBitmap(m_ScreenXor.GetBitmapFromData());
-			::Sleep(15);
+			Sleep(32);
 		}
 	}
 

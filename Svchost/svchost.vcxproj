@@ -86,7 +86,8 @@
     </Bscmake>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>.\svchost.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
@@ -122,7 +123,8 @@
     </Bscmake>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <ModuleDefinitionFile>.\svchost.def</ModuleDefinitionFile>
+      <ModuleDefinitionFile>
+      </ModuleDefinitionFile>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <UACExecutionLevel>RequireAdministrator</UACExecutionLevel>
     </Link>
@@ -178,7 +180,7 @@
     <ClCompile Include="..\Seu_lib\Process.cpp" />
     <ClCompile Include="..\Seu_lib\SystemInfo.cpp">
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MultiThreaded</RuntimeLibrary>
-      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">MultiThreadedDebug</RuntimeLibrary>
       <RuntimeLibrary Condition="'$(Configuration)|$(Platform)'=='Dll|Win32'">MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <ClCompile Include="..\Seu_lib\VideoCap.cpp" />

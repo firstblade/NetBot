@@ -5,10 +5,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "Command.h" 
+#include "Command.h"
 //************************************
 // Method:      DOSShell
-// Access:      public 
+// Access:      public
 // Returns:     void
 // Parameter:   LPMsgHead lpMsgHead
 // Parameter:   char *pBuf

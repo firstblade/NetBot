@@ -5,8 +5,6 @@
 
 void ProcessList(char *pBuf, LPMsgHead lpMsgHead)
 {
-	GrantPrivilege();
-
 	typedef BOOL(WINAPI *QueryFullProcessImageName) (HANDLE hProcess, DWORD dwFlags, LPCSTR lpExeName, PDWORD lpdwSize);
 	QueryFullProcessImageName LxQueryFullProcessImageName = (QueryFullProcessImageName)GetProcAddress(GetModuleHandleW(L"Kernel32.dll"), "QueryFullProcessImageNameA");
 	if (LxQueryFullProcessImageName == NULL)

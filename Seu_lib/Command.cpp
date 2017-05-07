@@ -7,8 +7,8 @@ BOOL TurnonKeepAlive(SOCKET s, UINT nKeepAliveSec)
 	if (nKeepAliveSec < 1)
 		return TRUE;
 
-	BOOL bSetKeepAlive = TRUE;
-	if (setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, (const char*)&bSetKeepAlive, sizeof(BOOL)) != 0)
+	char bSetKeepAlive = TRUE;
+	if (setsockopt(s, SOL_SOCKET, SO_KEEPALIVE, &bSetKeepAlive, sizeof(bSetKeepAlive)) != 0)
 		return FALSE;
 
 	DWORD dwBytes;

@@ -12,10 +12,12 @@
 
 #define vipid 405
 
+#define _CRT_SECURE_TEMPLATE_OVERLOADS 1
+
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
-#define WINVER 0X502
-#define _WIN32_WINNT 0x0502
+#define WINVER _WIN32_WINNT_WINXP
+#define _WIN32_WINNT _WIN32_WINNT_WINXP
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
@@ -28,10 +30,7 @@
 
 #include "..//..//debugh.h"
 
-#include "./ExClass/ThreadTemplate.h"
-
-#pragma warning(disable : 4786)
-#pragma warning(disable : 4200)
+#include "ExClass//ThreadTemplate.h"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

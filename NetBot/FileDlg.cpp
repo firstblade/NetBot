@@ -110,17 +110,17 @@ BOOL CFileDlg::OnInitDialog()
 		WS_CHILD |
 		WS_VISIBLE |
 		CBRS_ALIGN_TOP |
-		CBRS_GRIPPER |
+		//CBRS_GRIPPER |
 		CBRS_TOOLTIPS,
-		CRect(2, 2, 0, 0)) ||
+		CRect(0, 0, 0, 0)) ||
 		!m_wndToolBar.LoadToolBar(IDR_FILE_TOOLBAR))
 	{
 		TRACE0("failed to create toolbar\n");
 		return FALSE;
 	}
 	//Add bitmap to toolbar
-	m_wndToolBar.LoadTrueColorToolBar(16, IDB_FILETB_NORMAL, IDB_FILETB_HOT,
-		IDB_FILETB_DISABLE);
+	m_wndToolBar.LoadTrueColorToolBar(16, IDB_FILETB_NORMAL, IDB_FILETB_HOT, IDB_FILETB_DISABLE);
+
 	RepositionBars(AFX_IDW_CONTROLBAR_FIRST, AFX_IDW_CONTROLBAR_LAST, 0);
 	VERIFY(m_wndToolBar.SetButtonText(0, "œÚ…œ"));
 	VERIFY(m_wndToolBar.SetButtonText(1, "∏¥÷∆"));

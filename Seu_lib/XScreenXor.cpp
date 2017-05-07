@@ -23,7 +23,7 @@ XScreenXor::XScreenXor()
 	m_ScrWidth = 0;
 	m_ScrHeight = 0;
 	m_nColor = 8;//Ä¬ÈÏ256É«
-	MAXWIDTH = 1920;
+	MAXWIDTH = 2560;
 	Radio = 1;
 
 	DestWidth = 0;
@@ -36,7 +36,7 @@ XScreenXor::XScreenXor()
 	hdesk = NULL;
 	hdeskCurrent = NULL;
 
-	//OpenUserDesktop();
+	OpenUserDesktop();
 }
 
 XScreenXor::~XScreenXor()

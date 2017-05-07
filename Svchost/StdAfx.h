@@ -18,15 +18,17 @@
 #endif
 
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-#define _WIN32_WINNT 0x0502
+#define _WIN32_WINNT _WIN32_WINNT_WINXP
+
+#define _CRT_SECURE_TEMPLATE_OVERLOADS 1
 
 #include <windows.h>
 #include <tchar.h>
-#pragma warning(disable : 4200)
+//#pragma warning(disable : 4200)
 
 #include "Functions.h"
 
-#include "../../debugh.h"
+#include "..//..//debugh.h"
 
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.

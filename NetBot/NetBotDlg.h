@@ -8,10 +8,10 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include "./ExControl/TrueColorToolBar.h"
-#include "./ExClass/SEU_QQwry.h"
-#include "./ExClass/IniFile.h"
-#include "./ExClass/AutoLock.h"
+#include "ExControl//TrueColorToolBar.h"
+#include "ExClass//SEU_QQwry.h"
+#include "ExClass//IniFile.h"
+#include "ExClass//AutoLock.h"
 
 #include "FileDlg.h"
 #include "ScreenDlg.h"
@@ -25,7 +25,7 @@
 #include "SetDlg.h"
 #include "UpdateDlg.h"
 
-#include "../Seu_lib/Command.h"
+#include "..//Seu_lib//Command.h"
 #include <winsock2.h>
 #pragma comment (lib,"ws2_32.lib")
 
@@ -111,7 +111,6 @@ protected:
 	CIniFile          m_Ini;
 	SEU_QQwry         m_QQDat;
 	CTrueColorToolBar m_wndtoolbar;
-	//CToolBar          m_wndtoolbar;
 	CStatusBarCtrl    m_wndStatusBar;
 	CImageList        m_ImageOnlinelist;
 

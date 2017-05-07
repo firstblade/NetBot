@@ -269,20 +269,13 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="res\outlook\default1.bin">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="res\NetBot.rc2">
-      <Filter>Resource Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="res\outlook\skin1.bin">
       <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\xp.mainfest" />
-    <None Include="res\fsg.exe" />
-    <None Include="res\upx.exe" />
-    <None Include="..\nb.exe" />
+    <None Include="res\xp.mainfest">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
