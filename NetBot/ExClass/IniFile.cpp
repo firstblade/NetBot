@@ -46,10 +46,10 @@ BOOL CIniFile::SetPath(CString strPath)
 
 BOOL CIniFile::Createini()//创建m_strPath中的ini文件
 {
-	if (m_strPath != "")
+	if (!m_strPath.IsEmpty())
 	{
 		FILE *fp = fopen(CT2A(m_strPath), "a+");
-		fclose(fp);
+		if(fp) fclose(fp);
 	}
 	else
 		AfxMessageBox(_T("请先用SetPath函数设置路径!"));
@@ -114,8 +114,8 @@ int CIniFile::GetAllSections(CStringArray& strArrSection)
 	TCHAR chAllSections[MAX_ALLSECTIONS];
 	TCHAR chTempSection[MAX_SECTION];
 
-	ZeroMemory(chAllSections, MAX_ALLSECTIONS);
-	ZeroMemory(chTempSection, MAX_SECTION);
+	ZeroMemory(chAllSections, MAX_ALLSECTIONS * sizeof(TCHAR));
+	ZeroMemory(chTempSection, MAX_SECTION * sizeof(TCHAR));
 
 	GetPrivateProfileSectionNames(chAllSections, MAX_ALLSECTIONS, m_strPath);
 
@@ -136,7 +136,7 @@ int CIniFile::GetAllSections(CStringArray& strArrSection)
 		if (chAllSections[j] == NULL)
 		{
 			strArrSection.Add(chTempSection);
-			ZeroMemory(chTempSection, MAX_SECTION);
+			ZeroMemory(chTempSection, MAX_SECTION * sizeof(TCHAR));
 			iPos = 0;
 		}
 	}
@@ -150,8 +150,8 @@ int CIniFile::GetAllKeysAndValues(CString strSection, CStringArray&strArrKey, CS
 	TCHAR chAllKeysAndValues[MAX_ALLKEYS];
 	TCHAR chTempkeyAndValue[MAX_KEY];
 
-	ZeroMemory(chAllKeysAndValues, MAX_ALLKEYS);
-	ZeroMemory(chTempkeyAndValue, MAX_KEY);
+	ZeroMemory(chAllKeysAndValues, MAX_ALLKEYS * sizeof(TCHAR));
+	ZeroMemory(chTempkeyAndValue, MAX_KEY * sizeof(TCHAR));
 
 	GetPrivateProfileSection(strSection, chAllKeysAndValues, MAX_ALLKEYS, m_strPath);
 
@@ -178,7 +178,7 @@ int CIniFile::GetAllKeysAndValues(CString strSection, CStringArray&strArrKey, CS
 			CString strTempKey = chTempkeyAndValue;
 			strArrKey.Add(strTempKey.Left(strTempKey.Find('=')));
 			strArrKeyValue.Add(strTempKey.Mid(strTempKey.Find('=') + 1));
-			ZeroMemory(chTempkeyAndValue, MAX_KEY);
+			ZeroMemory(chTempkeyAndValue, MAX_KEY * sizeof(TCHAR));
 			iPos = 0;
 		}
 	}

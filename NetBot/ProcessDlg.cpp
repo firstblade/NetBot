@@ -23,6 +23,9 @@ CProcessDlg::CProcessDlg(CWnd* pParent /*=NULL*/)
 	//}}AFX_DATA_INIT
 	m_ConnSocket = INVALID_SOCKET;
 	m_hWorkThread = NULL;
+
+	ZeroMemory(m_Buffer, 128 * 1024);
+	ZeroMemory(&m_MsgHead, sizeof(m_MsgHead));
 }
 
 

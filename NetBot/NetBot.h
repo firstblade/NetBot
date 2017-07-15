@@ -13,7 +13,7 @@
 #endif
 
 #include "resource.h"		// main symbols
-#include "./ExControl/SplashScreenEx.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CNetBotApp:
 // See NetBot.cpp for the implementation of this class
@@ -24,7 +24,6 @@ class CNetBotApp : public CWinApp
 public:
 	CNetBotApp();
 	void DecryptData(unsigned char *szRec, unsigned long nLen, unsigned long key);
-	CSplashScreenEx *pSplash;
 	DWORD VipID;
 	//////////////////////////////
 	//

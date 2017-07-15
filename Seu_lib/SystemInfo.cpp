@@ -5,12 +5,12 @@ BOOL RtlGetVersionEx(LPOSVERSIONINFOW lpVersionInformation)
 {
 	typedef DWORD NTSTATUS;
 
-	typedef NTSTATUS(NTAPI* TRtlGetVersion)(PRTL_OSVERSIONINFOW);
+	typedef NTSTATUS (NTAPI* TRtlGetVersion)(PRTL_OSVERSIONINFOW);
 	TRtlGetVersion lpRtlGetVersion = (TRtlGetVersion)GetProcAddress(GetModuleHandleW(L"NTDLL"), "RtlGetVersion");
 
 	if (lpRtlGetVersion)
 	{
-		return lpRtlGetVersion((PRTL_OSVERSIONINFOW)lpVersionInformation) >= 0;
+		return lpRtlGetVersion((PRTL_OSVERSIONINFOW)lpVersionInformation);
 	}
 
 	return false;
@@ -69,7 +69,7 @@ BOOL GetSystemInfo(SysInfo& info)
 	{
 		lstrcatA(szSystem, " x86");
 	}
-	wsprintfA(info.cOS, "%s SP%d (Build %d)", szSystem, osvi.wServicePackMajor, osvi.dwBuildNumber);
+	wsprintfA(info.cOS, "%s SP%u (Build %u)", szSystem, osvi.wServicePackMajor, osvi.dwBuildNumber);
 
 	MEMORYSTATUSEX mem;
 	mem.dwLength = sizeof(mem);

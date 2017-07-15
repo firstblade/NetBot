@@ -50,25 +50,25 @@ class SEU_QQwry
 
 public://普通用户接口函数
 	void SetPath(CString path);//设置QQWry.dat的路径
-	CString IPtoAdd(CString szIP);//参数是IP,返回IP对应的地址   
+	CString IPtoAdd(CString szIP);//参数是IP,返回IP对应的地址
 	void SaveToFile(CString Name);//将QQWry.dat文件的内容导出为指定的文件
 
-public://高级用户函数	
+public://高级用户函数
 	DWORD m_dwLastIP;
 	CString GetCountryLocal(int index);
 	DWORD GetSIP(int index);
 	DWORD IPtoDWORD(CString szIP);
 	int GetIndex(CString szIP);
-	CString GetStr(void);
+	CString GetStr();
 	CString GetCountryLocal(BYTE bMode, int ioffset);
 	CString GetStr(int ioffset);
-	int GetRecordCount(void);
+	int GetRecordCount();
 	int m_i;
 	int GetStartIPInfo(int iIndex);
 	CString m_buf;
-	bool GetBE(void);
+	bool GetBE();
 	bool OpenQQwry(CString szFileName);//打开QQwry数据库
-	void CloseQQwry(void);//关闭QQwry数据库
+	void CloseQQwry();//关闭QQwry数据库
 	BE m_be;
 	IPOFF m_ipoff;
 	EndInfo m_ei;

@@ -286,7 +286,7 @@ HBITMAP XScreenXor::GetBitmapFromData()
 
 	HDC hDC = CreateDCA("DISPLAY", NULL, NULL, NULL);
 	// ´´½¨DDBÎ»Í¼
-	HBITMAP hBitmap = CreateDIBitmap(
+	HBITMAP bitmap = CreateDIBitmap(
 		hDC,
 		&lpBmpInfo->bmiHeader,
 		CBM_INIT,
@@ -296,7 +296,7 @@ HBITMAP XScreenXor::GetBitmapFromData()
 
 	DeleteDC(hDC);
 
-	return hBitmap;
+	return bitmap;
 }
 
 ////////////////////////////////////////////////////////////////////////////

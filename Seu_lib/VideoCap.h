@@ -28,7 +28,7 @@ private:
 	LPVOID m_lpDIB;
 	HWND m_hWnd;
 	HWND m_hWndCap;
-	bool m_bIsCapture;
+	volatile bool m_bIsCapture;
 	static bool m_bIsConnected;
 };
 

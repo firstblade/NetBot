@@ -32,6 +32,14 @@
 
 #include "ExClass//ThreadTemplate.h"
 
+#include <string>
+
+#ifndef UNICODE
+typedef std::string String;
+#else
+typedef std::wstring String;
+#endif
+
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

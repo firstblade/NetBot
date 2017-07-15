@@ -322,10 +322,7 @@ void CServerDlg::OnOk()
 
 	WriteFile(hFile, (LPVOID)p, dwSize, &dwWritten, NULL);
 
-	if (hFile)
-	{
-		CloseHandle(hFile);
-	}
+	CloseHandle(hFile);
 
 	if (p)
 	{

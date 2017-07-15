@@ -42,8 +42,9 @@ CVideoCap::~CVideoCap()
 
 		if (m_lpbmi)
 			delete[] m_lpbmi;
-		if (m_lpDIB)
+		if (m_lpDIB != NULL)
 			delete[] m_lpDIB;
+
 		m_bIsConnected = false;
 	}
 
@@ -65,8 +66,7 @@ LRESULT CALLBACK CVideoCap::FrameCallbackProc(HWND hWnd, LPVIDEOHDR lpVHdr)
 		if (pThis != NULL)
 		{
 			memcpy(pThis->m_lpDIB, lpVHdr->lpData, pThis->m_lpbmi->bmiHeader.biSizeImage);
-			InterlockedExchange((LPLONG)&(pThis->m_bIsCapture), false);//±ªø®∞Õ…±µÙ¡À
-//			pThis->m_bIsCapture = false;
+			pThis->m_bIsCapture = false;
 		}
 	}
 	__except (1)
@@ -96,8 +96,7 @@ BOOL CVideoCap::IsWebCam()
 
 LPVOID CVideoCap::GetDIB()
 {
-	InterlockedExchange((LPLONG)&(m_bIsCapture), true);
-	//	m_bIsCapture = true;//±ªø®∞Õ…±µÙ¡À
+	m_bIsCapture = true;
 	capGrabFrameNoStop(m_hWndCap);
 	while (m_bIsCapture == true)
 		Sleep(100);
@@ -107,8 +106,8 @@ LPVOID CVideoCap::GetDIB()
 
 bool CVideoCap::Initialize()
 {
-	CAPDRIVERCAPS	gCapDriverCaps;
-	DWORD			dwSize;
+	CAPDRIVERCAPS gCapDriverCaps;
+	DWORD dwSize;
 
 	if (!IsWebCam())
 		return false;

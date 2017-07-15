@@ -5,6 +5,8 @@
 #include "NetBot.h"
 #include "NetBotDlg.h"
 
+using namespace std;
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #undef THIS_FILE
@@ -23,7 +25,7 @@ typedef struct tagSocketInput
 {
 	SOCKET sMainConnect;
 	SOCKET sHelpConnect;
-}SocketInput, *LPSocketInput;
+} SocketInput, *LPSocketInput;
 
 /////////////////////////////////////////////////////////////////////////////
 // CNetBotDlg dialog
@@ -236,8 +238,6 @@ void CNetBotDlg::CreateIniFile()
 	UpdateData(FALSE);
 }
 
-//#include "start.h"
-
 BOOL CNetBotDlg::OnInitDialog()
 {
 	CDialog::OnInitDialog();
@@ -247,7 +247,7 @@ BOOL CNetBotDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
 	CreateIniFile();
-	////////////////////////////////////////////////////////////////////////
+
 	//create toolbar
 	if (!m_wndtoolbar.CreateEx(this, TBSTYLE_FLAT, WS_CHILD | WS_VISIBLE | CBRS_TOP
 		| CBRS_TOOLTIPS | CBRS_FLYBY, //| CBRS_SIZE_DYNAMIC  | CBRS_GRIPPER
@@ -320,15 +320,12 @@ BOOL CNetBotDlg::OnInitDialog()
 	/*------QQWry.dat------------------------------------------------------*/
 	TCHAR Path[255];
 	GetCurrentDirectory(255, Path);
-	CString path;
-	path.Format(_T("%s\\QQWry.Dat"), Path);
+	CString path(Path);
+	path += "\\QQWry.Dat";
+	//path.Format(_T("%s\\QQWry.Dat"), Path);
 	m_QQDat.SetPath(path);
 
 	StartListen(m_ListenPort);
-
-	//在创建了主对话框 并初始化了各个子对话框以后，隐藏启动画面
-	if (((CNetBotApp*)AfxGetApp())->pSplash != NULL)
-		((CNetBotApp*)AfxGetApp())->pSplash->Hide();
 
 	return TRUE;  // return TRUE  unless you set the focus to a control
 }
@@ -431,8 +428,7 @@ LRESULT CNetBotDlg::OnCloseEvent(WPARAM wParam, LPARAM lParam)
 
 	return TRUE;
 }
-///////////////////////////////////////////////////////////////////////////////////
-//
+
 void CNetBotDlg::EnableOnlineCtrls(BOOL bEnable)
 {
 	CWnd* pWndCtl = GetWindow(GW_CHILD);
@@ -691,17 +687,20 @@ int __stdcall ReadData(TCHAR szFile[], char **data)
 	{
 		if (szPath[i] == '\\')
 		{
-			szPath[i] = '\0';
+			szPath[i + 1] = '\0';
 			break;
 		}
 	}
 
 	SetCurrentDirectory(szPath);
 
-	TCHAR szLogFileName[256];
-	wsprintf(szLogFileName, _T("%s\\%s"), szPath, szFile);
+	String logFile = szPath;
+	logFile += szFile;
 
-	HANDLE hFile = CreateFile(szLogFileName,
+	//TCHAR szLogFileName[256];
+	//wsprintf(szLogFileName, _T("%s\\%s"), szPath, szFile);
+
+	HANDLE hFile = CreateFile(logFile.c_str(),
 		GENERIC_ALL,
 		FILE_SHARE_READ,
 		(LPSECURITY_ATTRIBUTES)NULL,
@@ -722,7 +721,7 @@ int __stdcall ReadData(TCHAR szFile[], char **data)
 		return dwSize;
 	}
 
-	MsgErr(_T("Read %s Error"), szLogFileName);
+	MsgErr(_T("Read %s Error"), logFile.c_str());
 
 	return -1;
 }

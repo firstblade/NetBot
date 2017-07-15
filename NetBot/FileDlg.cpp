@@ -24,6 +24,8 @@ CFileDlg::CFileDlg(CWnd* pParent /*=NULL*/) : CDialog(CFileDlg::IDD, pParent)
 	m_ViewStyle = LVS_REPORT;
 	m_Buffer = new char[2048 * 1024]; //数据交换区 2MB
 	m_hWorkThread = NULL;
+
+	ZeroMemory(&m_MsgHead, sizeof(m_MsgHead));
 }
 
 CFileDlg::~CFileDlg()
@@ -763,7 +765,10 @@ void CFileDlg::OnSelchangedFiletree(NMHDR* pNMHDR, LRESULT* pResult)
 		return;
 
 	//设置当前目录
-	m_CurrPath.Format(_T("%c:"), (char)ch);
+	char asciPath[] = "c:";
+	asciPath[0] = ch;
+
+	m_CurrPath = CA2T(asciPath);
 	UpdateData(FALSE);
 	//拼接列举路径
 	m_SendPath = m_CurrPath + _T("\\*");

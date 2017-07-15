@@ -15,9 +15,9 @@ class CServerDlg : public CDialog
 	// Construction
 public:
 	CServerDlg(CWnd* pParent = NULL);   // standard constructor
-	char  ServerUrl[256];
+	char  ServerUrl[256] = { 0 };
 
-	TCHAR Path[512];
+	TCHAR Path[512] = { 0 };
 
 	// Dialog Data
 		//{{AFX_DATA(CServerDlg)

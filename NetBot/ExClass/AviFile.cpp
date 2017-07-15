@@ -19,6 +19,9 @@ CAviFile::CAviFile(LPCTSTR lpszFileName /* =_T("Output.avi") */,
 	m_pAviStream = NULL;
 	m_pAviCompressedStream = NULL;
 
+	ZeroMemory(&m_AviStreamInfo, sizeof(m_AviStreamInfo));
+	ZeroMemory(&m_AviCompressOptions, sizeof(m_AviCompressOptions));
+
 	m_dwFCCHandler = dwCodec;
 	m_dwFrameRate = dwFrameRate;
 

@@ -33,7 +33,7 @@ void ProcessList(char *pBuf, LPMsgHead lpMsgHead)
 		Info.dwThreads = PInfo.cntThreads;
 
 		WideCharToMultiByte(CP_ACP, 0, PInfo.szExeFile, wcslen(PInfo.szExeFile), Info.FileName, 32, NULL, NULL);
-		//lstrcpynA(Info.FileName, PInfo.szExeFile, 32);
+		//strncpy(Info.FileName, PInfo.szExeFile, 32);
 
 		HANDLE hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, PInfo.th32ProcessID);
 		Info.dwPriClass = GetPriorityClass(hProcess);

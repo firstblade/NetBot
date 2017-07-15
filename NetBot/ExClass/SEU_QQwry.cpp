@@ -22,6 +22,9 @@ static char THIS_FILE[] = __FILE__;
 //////////////////////////////////////////////////////////////////////
 SEU_QQwry::SEU_QQwry(): m_dwLastIP(0), m_i(0), m_bOpen(false)
 {
+	ZeroMemory(&m_ei, sizeof(m_ei));
+	ZeroMemory(&m_be, sizeof(m_be));
+	ZeroMemory(&m_ipoff, sizeof(m_ipoff));
 }
 
 SEU_QQwry::~SEU_QQwry()
@@ -287,7 +290,7 @@ CString SEU_QQwry::GetStr()
 void SEU_QQwry::SaveToFile(CString Name)
 {
 	CStringA str1, str2;
-	FILE *out = fopen(CT2A(Name + ".txt"), "wb");
+	FILE *out = fopen(CT2A(Name + _T(".txt")), "wb");
 
 	CStringA m_buf;
 	m_buf.Format("Total %d\r\n", GetRecordCount());//得到总记录
@@ -313,7 +316,7 @@ void SEU_QQwry::SaveToFile(CString Name)
 *********************************************************************/
 CString SEU_QQwry::IPtoAdd(CString szIP)
 {
-	if (szIP == "")return "请输入IP地址";
+	if (szIP == "") return "请输入IP地址";
 	return GetCountryLocal(GetIndex(szIP));
 }
 
@@ -400,7 +403,7 @@ DWORD SEU_QQwry::IPtoDWORD(CString szIP)
 		if (ch == '.')
 		{
 			b[iXB] = _ttoi(szTemp);
-			szTemp = "";
+			szTemp.Empty();
 			iXB++;
 		}
 	}
