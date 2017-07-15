@@ -8,10 +8,19 @@
 #include <winsock2.h>
 #include "mstcpip.h"
 
-const int STATE_EXIT = 42;
+enum class WORKING_STATE : DWORD
+{
+	LOAD_OK,
+	RECEIVE_OK,
+	CONNECT_ERR,
+	REQUEST_ERR,
+	RECEIVE_ERR,
+	LOAD_ERR,
+	ON_EXIT
+};
 
 // SOCKET buffer max length
-#define BUFFER_MAXLEN		    1024*2
+#define BUFFER_MAXLEN		    1024 * 2
 #define XCHANGE_BUFLEN          2 * 1024 * 1024 //2M
 
 //socket type

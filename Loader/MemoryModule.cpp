@@ -770,9 +770,7 @@ void MemoryFreeLibrary(HMEMORYMODULE mod)
 	}
 
 	if (module->modules != NULL) {
-		// free previously opened libraries
-		int i;
-		for (i = 0; i < module->numModules; i++) {
+		for (int i = 0; i < module->numModules; i++) {
 			if (module->modules[i] != NULL) {
 				module->freeLibrary(module->modules[i], module->userdata);
 			}

